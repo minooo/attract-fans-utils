@@ -1,0 +1,48 @@
+// 公用的动画样式
+// https://daneden.github.io/animate.css/
+
+@keyframes rotate360 {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes orderFirst {
+  0% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0)
+  }
+  50% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0)
+  }
+  67% {
+    opacity: 0;
+    transform: translate3d(150%, 0, 0)
+  }
+  68% {
+    opacity: 0;
+    transform: translate3d(-150%, 0, 0)
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0)
+  }
+}
+@keyframes caseSlider{
+  0%{
+    opacity: 0;
+    transform: translateY(30px)
+  }
+  50%{
+    opacity: 0;
+    transform: translateY(30px)
+  }
+  100%{
+    opacity: 1;
+    transform: translateY(0px)
+  }
+}

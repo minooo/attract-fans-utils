@@ -1,0 +1,110 @@
+// 分享按钮覆盖
+.share .share-style-cover {
+  padding-left: 0px;
+  line-height: 0px;
+  height: auto;
+  margin: 0px;
+  margin-right: 8px;
+  height: 24px;
+  width: 24px;
+  background-repeat: no-repeat;
+  background-size: 24px 24px;
+  background-position: 0px 0px !important;
+}
+.share-style-cover:hover {
+  opacity: 1 !important;
+}
+.share .share-weixin {
+  background-image: url("../../images/app_detail_wechat.svg");
+}
+.share .share-weibo {
+  background-image: url("../../images/app_detail_weibo.svg");
+}
+.share .share-qzone {
+  background-image: url("../../images/app_detail_qzone.svg");
+}
+.bd_weixin_popup {
+  height: 310px !important;
+}
+// html {
+//   overflow-y: auto;
+// }
+// body {
+//   padding: 0!important;
+// }
+.ant-dropdown-menu-item:hover,
+.ant-dropdown-menu-submenu-title:hover {
+  background-color: #fff !important;
+}
+.ant-menu-inline-collapsed > .ant-menu-item .anticon-cus + span {
+  max-width: 0;
+  display: inline-block;
+  opacity: 0;
+}
+.du-font:before {
+  font-family: dudu !important;
+}
+
+.ant-layout,
+.ant-layout-footer {
+  background: #f1f6f3;
+}
+.ant-layout {
+  min-height: 100vh;
+}
+
+// 响应式覆盖
+@media (min-width: 550px) {
+  .app-Item .ant-col-xs-24 {
+    display: block;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    width: 100%;
+  }
+}
+@media (min-width: 850px) {
+  .app-Item .ant-col-sm-24 {
+    display: block;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    width: 100%;
+  }
+}
+@media (min-width: 1050px) {
+  .app-Item.ant-col-md-12 {
+    display: block;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    width: 50%;
+  }
+}
+@media (min-width: 1400px) {
+  .app-Item .ant-col-xl-8 {
+    display: block;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    width: 33%;
+  }
+}
+@media (min-width: 1680px) {
+  .app-Item .ant-col-xxl-6 {
+    display: block;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    width: 25%;
+  }
+}
+
+
+// @media (min-width: 1600px)
+// .ant-col-xxl-6 {
+//   display: block;
+//   -webkit-box-sizing: border-box;
+//   box-sizing: border-box;
+//   width: 25%;
+// }
+
+// @media (min-width: 1600px).ant-col-md-12
+
+// .ant-col-xl-8 .
+// .ant-col-xxl-6

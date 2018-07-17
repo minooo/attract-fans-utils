@@ -1,0 +1,178 @@
+@import "variables";
+
+@font-face {
+  font-family: 'dudu';
+  src:
+    url('#{$icomoon-font-path}/dudu.ttf?i6hibr') format('truetype'),
+    url('#{$icomoon-font-path}/dudu.woff?i6hibr') format('woff'),
+    url('#{$icomoon-font-path}/dudu.svg?i6hibr#dudu') format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
+
+[class^="i-"], [class*=" i-"] {
+  /* use !important to prevent issues with browser extensions that change fonts */
+  font-family: 'dudu' !important;
+  speak: none;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+
+  /* Better Font Rendering =========== */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@function unicode($str) {
+  @return unquote("\"") + $str + unquote("\"");
+}
+
+.i-loading {
+  &:before {
+    content: unicode($i-loading);
+  }
+}
+.i-out {
+  &:before {
+    content: unicode($i-out);
+  }
+}
+.i-used {
+  &:before {
+    content: unicode($i-used);
+  }
+}
+.i-back {
+  &:before {
+    content: unicode($i-back);
+  }
+}
+.i-share {
+  &:before {
+    content: unicode($i-share);
+  }
+}
+.i-reduce {
+  &:before {
+    content: unicode($i-reduce);
+  }
+}
+.i-star-o {
+  &:before {
+    content: unicode($i-star-o);
+  }
+}
+.i-add {
+  &:before {
+    content: unicode($i-add);
+  }
+}
+.i-address {
+  &:before {
+    content: unicode($i-address);
+  }
+}
+.i-left {
+  &:before {
+    content: unicode($i-left);
+  }
+}
+.i-business {
+  &:before {
+    content: unicode($i-business);
+  }
+}
+.i-close {
+  &:before {
+    content: unicode($i-close);
+  }
+}
+.i-completed {
+  &:before {
+    content: unicode($i-completed);
+  }
+}
+.i-comment {
+  &:before {
+    content: unicode($i-comment);
+  }
+}
+.i-tag {
+  &:before {
+    content: unicode($i-tag);
+  }
+}
+.i-delete {
+  &:before {
+    content: unicode($i-delete);
+  }
+}
+.i-edit {
+  &:before {
+    content: unicode($i-edit);
+  }
+}
+.i-star {
+  &:before {
+    content: unicode($i-star);
+  }
+}
+.i-fail {
+  &:before {
+    content: unicode($i-fail);
+  }
+}
+.i-right {
+  &:before {
+    content: unicode($i-right);
+  }
+}
+.i-tag-o {
+  &:before {
+    content: unicode($i-tag-o);
+  }
+}
+.i-more {
+  &:before {
+    content: unicode($i-more);
+  }
+}
+.i-order {
+  &:before {
+    content: unicode($i-order);
+  }
+}
+.i-recommend {
+  &:before {
+    content: unicode($i-recommend);
+  }
+}
+.i-group {
+  &:before {
+    content: unicode($i-group);
+  }
+}
+.i-success {
+  &:before {
+    content: unicode($i-success);
+  }
+}
+.i-phone {
+  &:before {
+    content: unicode($i-phone);
+  }
+}
+.i-clock {
+  &:before {
+    content: unicode($i-clock);
+  }
+}
+.i-wechat {
+  &:before {
+    content: unicode($i-wechat);
+    color: #53cc50;
+  }
+}
+
