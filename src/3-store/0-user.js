@@ -9,11 +9,12 @@ import { types } from 'mobx-state-tree';
  **/
 
 export default types
-  .model('UserStore', { name: "minooo" })
+  .model('UserStore', { name: "duzhihao" })
   .views(self => ({}))
   .actions(self => ({
     getUser(user) {
         self = user
+        return self.name
     },
     changeName(name) {
       self.name = name;
