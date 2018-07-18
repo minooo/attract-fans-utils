@@ -14,7 +14,7 @@ class Home extends Component {
   }
   onClick = () => {
     const { user, history } = this.props;
-    user.changeName("zhuang");
+    user.changeName("liu");
     history.push("/search", { state: { age: 111 } });
   };
   render() {
