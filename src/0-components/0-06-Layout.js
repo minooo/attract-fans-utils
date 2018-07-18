@@ -1,5 +1,6 @@
 import React, { Fragment, PureComponent } from "react";
 import { Layout, Menu, Icon } from "antd";
+import { withRouter } from "react-router-dom"
 import { WrapLink, LoadingFetch } from "0-components";
 
 const { Header, Sider, Footer } = Layout;
@@ -32,15 +33,16 @@ const keysArr = path => {
   return [["0"], ["00"]];
 };
 
-export default class extends PureComponent {
+class CommonLayout extends PureComponent {
   state = { handleOpenKeys: null }
   componentDidMount() {
+    // console.log(this.props, "did")
     // Router.onRouteChangeComplete = () => {
     //   this.setState(() => ({ handleOpenKeys: null }))
     // };
   }
   componentDidUpdate(prevProps) {
-    console.log(prevProps, "didupdate from AdminLayout")
+    // console.log(prevProps, "didupdate from AdminLayout")
   }
   onLogout = () => {
     const { onLogout } = this.props;
@@ -48,45 +50,61 @@ export default class extends PureComponent {
     // Router.replace("/index", "/app")
   }
   onOpenChange = openKeys => {
-    this.setState(() => ({ handleOpenKeys: [...openKeys] }))
+    console.log(openKeys, "openKeys")
+    const val = openKeys && openKeys.length > 0 && openKeys[openKeys.length - 1]
+    this.setState(() => ({ handleOpenKeys: [val] }))
   }
   handleClick = e => {
-    // switch (e.key) {
-    //   case "01":
-    //     Router.push("/4-admin/1-home", "/app/admin");
-    //     break;
-    //   case "21":
-    //     Router.push("/4-admin/2-1-account-list", "/app/admin/account-list");
-    //     break;
-    //   case "22":
-    //     Router.push("/4-admin/2-2-account-add", "/app/admin/account-add");
-    //     break;
-    //   case "23":
-    //     Router.push("/4-admin/2-3-account-log", "/app/admin/account-log");
-    //     break;
-    //   case "31":
-    //     Router.push("/4-admin/3-1-orders", "/app/admin/orders");
-    //     break;
-    //   case "32":
-    //     Router.push("/4-admin/3-2-bought-app", "/app/admin/bought-app");
-    //     break;
-    //   case "33":
-    //     Router.push("/4-admin/3-3-built-activities", "/app/admin/built-activities");
-    //     break;
-    //   case "34":
-    //     Router.push("/4-admin/3-4-deal-details", "/app/admin/deal-details");
-    //     break;
-    //   default:
-    //     console.info("menu click");
-    // }
+    const { history } = this.props
+    switch (e.key) {
+      case "00":
+        history.push("/");
+        break;
+      case "01":
+        history.push("/create-task-poster");
+        break;
+      case "02":
+        history.push("/base-info-set");
+        break;
+      case "03":
+        history.push("/member-join-tip");
+        break;
+      case "04":
+        history.push("/first-task-ok");
+        break;
+      case "05":
+        history.push("/second-task-ok");
+        break;
+      case "06":
+        history.push("/third-task-ok");
+        break;
+      case "07":
+        history.push("/message-reply");
+        break;
+      case "10":
+        history.push("/users-analyze");
+        break;
+      case "11":
+        history.push("/task-ok-analyze");
+        break;
+      case "12":
+        history.push("/prize-disbution");
+        break;
+      case "2":
+        history.push("/shielding-detection");
+        break;
+      default:
+        console.info("menu click");
+    }
   }
   onToggle = () => {}
   onResponse = () => {}
   render() {
     const { handleOpenKeys } = this.state
-    const { user, menu_collapsed, children } = this.props;
-    const arr = keysArr("/");
+    const { user, menu_collapsed, location, children } = this.props;
+    const arr = keysArr(location.pathname);
     const menuProps = menu_collapsed ? {} : { openKeys: handleOpenKeys || arr[0] }
+    console.log(menuProps, "menu")
     // if (!user || user) return <LoadingFetch />
     return (
       <Fragment>
@@ -182,3 +200,5 @@ export default class extends PureComponent {
     );
   }
 }
+
+export default withRouter(CommonLayout)

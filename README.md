@@ -2,6 +2,7 @@
 
 ## 前端备忘
 - [create-react-app 指北](https://github.com/facebook/create-react-app/blob/master/packages/react-scripts/template/README.md)
+- [react-router](https://reacttraining.com/react-router/web/guides/philosophy)
 
 # 一些必要讲解的
 - 支持直接引入图片
