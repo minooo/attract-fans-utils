@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { observer, inject } from "mobx-react";
 import { Button } from "antd";
 import { Loading } from "0-components";
-import { http } from "4-utils";
+import { http, common } from "4-utils";
 
 class Home extends Component {
   state = {};
@@ -11,6 +11,7 @@ class Home extends Component {
     http.get("applications").then(response => {
       console.log(response, "rrr");
     });
+    common.setTitle("创建任务海报");
   }
   onClick = () => {
     const { user, history } = this.props;

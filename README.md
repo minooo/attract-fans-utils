@@ -1,4 +1,4 @@
-## 嘟嘟科技吸粉工具管理后台前端项目
+## 嘟嘟科技-[公众号吸粉工具管理后台]-前端项目
 
 ## 前端备忘
 - [create-react-app 指北](https://github.com/facebook/create-react-app/blob/master/packages/react-scripts/template/README.md)

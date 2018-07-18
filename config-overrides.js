@@ -7,8 +7,7 @@ module.exports = function override(config, env) {
   config = injectBabelPlugin(['import', { libraryName: 'antd', style: true }], config);
   config = rewireLess.withLoaderOptions({
     modifyVars: {
-        "@primary-color": "#1CD2A8",
-        "@info-color": "#1CD2A8",
+        "@border-radius-base": "4px"
     },
   })(config, env);
   return config;
