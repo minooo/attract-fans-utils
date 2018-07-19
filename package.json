@@ -6,6 +6,7 @@
     "antd": "^3.6.6",
     "axios": "^0.18.0",
     "babel-plugin-import": "^1.8.0",
+    "fabric": "^2.3.3",
     "less": "2.7.3",
     "less-loader": "^4.1.0",
     "mobx": "^5.0.3",
