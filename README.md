@@ -1,7 +1,8 @@
-## 嘟嘟科技吸粉工具管理后台前端项目
+## 嘟嘟科技-[公众号吸粉工具管理后台]-前端项目
 
 ## 前端备忘
 - [create-react-app 指北](https://github.com/facebook/create-react-app/blob/master/packages/react-scripts/template/README.md)
+- [react-router](https://reacttraining.com/react-router/web/guides/philosophy)
 
 # 一些必要讲解的
 - 支持直接引入图片

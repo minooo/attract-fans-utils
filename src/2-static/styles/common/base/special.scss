@@ -5,6 +5,9 @@
   bottom: 0;
   left: 0;
 }
+.common-hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
 .common-width100 * {
   width: 100% !important;
 }
@@ -28,7 +31,135 @@
 .common-loading {
   animation: rotate360 4s infinite linear;
 }
+.common-foot-qrcode {
+  background-image: url("../../images/common_foot_qrcode.png");
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-size: 100%;
+}
+.common-shadow {
+  box-shadow: 0px 0px 30px 0px rgba(241, 241, 241, 1);
+}
+.common-brand {
+  width: 233px;
+  height: 44px;
+  margin-right: 60px;
+}
+.common-brand-bg-o {
+  background: url("../../images/common_brand_o.png") 0 0 no-repeat;
+}
+.common-brand-bg {
+  background: url("../../images/common_brand.png") 0 0 no-repeat;
+}
+.common-no-data{
+  background-image: url("../../images/common_nodata_img.png");
+  background-repeat: no-repeat;
+  background-size: 100%;
+  width: 200px;
+  height: 200px;
+}
 
-.common-c {
-    color: red
+// admin 样式
+.admin-right-border {
+  border-right: 1px solid #e9e9e9;
+  &:last-child {
+    border-right: none;
+  }
+}
+.admin-head-shadow {
+  box-shadow: 0px 2px 4px 0px rgba(50, 64, 77, 0.2);
+  position: relative;
+  z-index: 10;
+}
+.admin-common-tip {
+  padding: 16px 24px;
+}
+.admin-common-content {
+  margin: 24px 24px 0;
+  min-height: 360px;
+}
+.admin-account-bg {
+  background: url("../../images/admin_account.png") 0 0 no-repeat;
+  background-size: 100%;
+}
+.admin-money-bg {
+  background: url("../../images/admin_money.png") 0 0 no-repeat;
+  background-size: 100%;
+}
+.admin-avatar-bg {
+  background: url("../../images/admin_avatar.png") 0 0 no-repeat;
+  background-size: 100%;
+  margin-right: 8px;
+}
+.admin-logo-normal {
+  width: 220px;
+  background-position: center center;
+}
+.admin-logo-collapsed {
+  width: 80px;
+  background-position: 25px center;
+  padding: 0 25px;
+  background-clip: content-box;
+}
+.admin-logo {
+  transition: width 0.3s;
+  height: 66px;
+  background-image: url("../../images/common_brand_o.png");
+  background-repeat: no-repeat;
+  background-size: 147px 29px;
+}
+
+.admin-com-trigger {
+  font-size: 20px;
+  line-height: 64px;
+  cursor: pointer;
+  transition: all 0.3s, padding 0s;
+  padding: 0 24px;
+}
+.admin-com-trigger:hover {
+  background: #e6f7ff;
+}
+
+.admin-bought-content {
+  margin: 24px 12px;
+  min-height: 360px;
+}
+// 404 500 样式
+.exception-404 {
+  background-image: url("https://gw.alipayobjects.com/zos/rmsportal/KpnpchXsobRgLElEozzI.svg");
+}
+
+.exception-500 {
+  background-image: url("https://gw.alipayobjects.com/zos/rmsportal/RVRUAYdCGeYNBWoKiIwB.svg");
+}
+
+.exception-left {
+  padding-right: 88px;
+  flex: 0 0 55%;
+  width: 55%;
+}
+
+.exception-left-box {
+  height: 360px;
+  width: 100%;
+  max-width: 430px;
+  background-repeat: no-repeat;
+  background-position: 50% 50%;
+  background-size: contain;
+}
+
+.exception-right {
+  h1 {
+    color: #434e59;
+    font-size: 72px;
+    font-weight: 600;
+    line-height: 72px;
+    margin-bottom: 24px;
+  }
+  h2 {
+    color: rgba(0, 0, 0, 0.45);
+    font-size: 20px;
+    line-height: 28px;
+    margin-bottom: 16px;
+  }
 }

@@ -1,6 +1,5 @@
 import React, { Component, Fragment } from "react";
 import DevTools from "mobx-react-devtools";
-import "../2-static/styles/common/common.css";
 import Boot from "./Boot";
 import routes from "./routes";
 
