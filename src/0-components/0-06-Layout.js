@@ -1,61 +1,58 @@
-import React, { Fragment, PureComponent } from "react";
+import React, { Fragment, Component } from "react";
 import { Layout, Menu, Icon } from "antd";
 import { withRouter } from "react-router-dom"
-import { WrapLink, LoadingFetch } from "0-components";
+import { observer, inject } from "mobx-react";
+import { WrapLink } from "0-components";
+import { common } from "4-utils";
 
 const { Header, Sider, Footer } = Layout;
 const { SubMenu } = Menu;
 
 const keysArr = path => {
   if (path.includes("/create-task-poster")) {
-    return [["0"], ["01"], "公众号列表"];
+    return [["0"], ["01"], "创建任务海报"];
   } else if (path.includes("/base-info-set")) {
-    return [["0"], ["02"], "添加公众号"];
+    return [["0"], ["02"], "基本信息设置"];
   } else if (path.includes("/member-join-tip")) {
-    return [["0"], ["03"], "账号日志"];
+    return [["0"], ["03"], "成员加入提醒"];
   } else if (path.includes("/first-task-ok")) {
-    return [["0"], ["04"], "我的订单"];
+    return [["0"], ["04"], "一阶任务完成"];
   } else if (path.includes("/second-task-ok")) {
-    return [["0"], ["05"], "已购应用"];
+    return [["0"], ["05"], "二阶任务完成"];
   } else if (path.includes("/third-task-ok")) {
-    return [["0"], ["06"], "已建活动"];
+    return [["0"], ["06"], "三阶任务完成"];
   } else if (path.includes("/message-reply")) {
-    return [["0"], ["07"], "交易明细"];
+    return [["0"], ["07"], "客服消息回复"];
   } else if (path.includes("/users-analyze")) {
-    return [["1"], ["10"], "数据统计"];
+    return [["1"], ["10"], "用户分析"];
   } else if (path.includes("/task-ok-analyze")) {
-    return [["1"], ["11"], "应用中心"];
+    return [["1"], ["11"], "任务完成分析"];
   } else if (path.includes("/prize-disbution")) {
-    return [["1"], ["12"], "账户设置"];
+    return [["1"], ["12"], "奖品发放情况"];
   } else if (path.includes("/shielding-detection")) {
-    return [["2"], ["2"], "账户设置"];
+    return [["2"], ["2"], "预警机制"];
   }
-  return [["0"], ["00"]];
+  return [["0"], ["00"], "首页"];
 };
 
-class CommonLayout extends PureComponent {
-  state = { handleOpenKeys: null }
-  componentDidMount() {
-    // console.log(this.props, "did")
-    // Router.onRouteChangeComplete = () => {
-    //   this.setState(() => ({ handleOpenKeys: null }))
-    // };
-  }
-  componentDidUpdate(prevProps) {
-    // console.log(prevProps, "didupdate from AdminLayout")
-  }
-  onLogout = () => {
-    const { onLogout } = this.props;
-    onLogout();
-    // Router.replace("/index", "/app")
+class CommonLayout extends Component {
+  constructor(props){
+    super(props)
+    const { location } = this.props;
+    const arr = keysArr(location.pathname);
+    console.log(arr[0], 'ciao')
+    this.state = {
+      handleOpenKeys: arr[0]
+    }
   }
   onOpenChange = openKeys => {
-    console.log(openKeys, "openKeys")
-    const val = openKeys && openKeys.length > 0 && openKeys[openKeys.length - 1]
-    this.setState(() => ({ handleOpenKeys: [val] }))
+    console.log(openKeys, "openkey")
+    this.setState(() => ({ handleOpenKeys: [...openKeys] }))
   }
   handleClick = e => {
     const { history } = this.props
+    const key = e.key.slice(0, 1)
+    this.setState(() => ({ handleOpenKeys: [key] }))
     switch (e.key) {
       case "00":
         history.push("/");
@@ -97,14 +94,20 @@ class CommonLayout extends PureComponent {
         console.info("menu click");
     }
   }
-  onToggle = () => {}
-  onResponse = () => {}
+  onResponse = collapsed => {
+    const { menuCollapsed } = this.props;
+    menuCollapsed.setCollapsed(collapsed);
+  };
+  onToggle = () => {
+    const { menuCollapsed } = this.props;
+    menuCollapsed.setCollapsed(!menuCollapsed.isCollapsed);
+  };
   render() {
     const { handleOpenKeys } = this.state
-    const { user, menu_collapsed, location, children } = this.props;
+    const { menuCollapsed, location, children } = this.props;
     const arr = keysArr(location.pathname);
-    const menuProps = menu_collapsed ? {} : { openKeys: handleOpenKeys || arr[0] }
-    console.log(menuProps, "menu")
+    const menuProps = menuCollapsed.isCollapsed ? {} : { openKeys: handleOpenKeys || arr[0] }
+    common.setTitle(arr[2]);
     // if (!user || user) return <LoadingFetch />
     return (
       <Fragment>
@@ -112,7 +115,7 @@ class CommonLayout extends PureComponent {
           <Sider
             trigger={null}
             collapsible
-            collapsed={menu_collapsed}
+            collapsed={menuCollapsed.isCollapsed}
             breakpoint="lg"
             onCollapse={this.onResponse}
             className="admin-layout-sider"
@@ -126,7 +129,7 @@ class CommonLayout extends PureComponent {
             >
               <div
                 className={`admin-logo ${
-                  menu_collapsed ? "admin-logo-collapsed" : "admin-logo-normal"
+                  menuCollapsed.isCollapsed ? "admin-logo-collapsed" : "admin-logo-normal"
                 }`}
               />
             </WrapLink>
@@ -134,8 +137,6 @@ class CommonLayout extends PureComponent {
             <Menu
               theme="dark"
               mode="inline"
-              // defaultOpenKeys={defaultOpenKeys}
-              // defaultSelectedKeys={defaultSelectedKeys}
               {...menuProps}
               onOpenChange={this.onOpenChange}
               selectedKeys={arr[1]}
@@ -178,11 +179,11 @@ class CommonLayout extends PureComponent {
               </Menu.Item>
             </Menu>
           </Sider>
-          <Layout style={{ marginLeft: menu_collapsed ? 80 : 220 }} className="transition-margin">
+          <Layout style={{ marginLeft: menuCollapsed.isCollapsed ? 80 : 220 }} className="transition-margin">
             <Header style={{ padding: "0 24px 0 0", backgroundColor: "#fff" }} className="flex jc-between ai-center admin-head-shadow">
               <Icon
                 className="admin-com-trigger"
-                type={menu_collapsed ? "menu-unfold" : "menu-fold"}
+                type={menuCollapsed.isCollapsed ? "menu-unfold" : "menu-fold"}
                 onClick={this.onToggle}
               />
               <div>shadow</div>
@@ -201,4 +202,4 @@ class CommonLayout extends PureComponent {
   }
 }
 
-export default withRouter(CommonLayout)
+export default withRouter(inject("menuCollapsed")(observer(CommonLayout)))

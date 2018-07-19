@@ -10,13 +10,10 @@ import { types } from 'mobx-state-tree';
 // https://github.com/mobxjs/mobx-state-tree
 
 export default types
-  .model({ name: types.string })
+  .model({ isCollapsed: types.boolean})
   .views(self => ({}))
   .actions(self => ({
-    getUser(user) {
-        self = user
-    },
-    changeName(name) {
-      self.name = name;
+    setCollapsed(val) {
+        self.isCollapsed = val
     }
-  })).create({ name: "minooo" });
+  })).create({ isCollapsed: false });
