@@ -1,5 +1,5 @@
 import React from "react";
-import { RequestStatus } from "./index";
+import { RequestStatus } from ".";
 
 export default function Loading(props) {
   if (props.isLoading) {

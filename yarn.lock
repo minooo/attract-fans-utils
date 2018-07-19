@@ -4947,9 +4947,9 @@ mkdirp@0.5.1, mkdirp@0.5.x, "mkdirp@>=0.5 0", mkdirp@^0.5.0, mkdirp@^0.5.1, mkdi
   dependencies:
     minimist "0.0.8"
 
-mobx-react-devtools@^5.0.1:
-  version "5.0.1"
-  resolved "http://registry.npm.taobao.org/mobx-react-devtools/download/mobx-react-devtools-5.0.1.tgz#9473c85929b2fc0c95086430419028cebd96fb3b"
+mobx-react-devtools@^6.0.1:
+  version "6.0.1"
+  resolved "http://registry.npm.taobao.org/mobx-react-devtools/download/mobx-react-devtools-6.0.1.tgz#24fdb14349e1b0b5a014d7c031cfe8188ed9c418"
 
 mobx-react@^5.2.3:
   version "5.2.3"

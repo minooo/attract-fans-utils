@@ -2,6 +2,11 @@ import React, { Component } from "react";
 import { observer, inject } from "mobx-react";
 import { Table } from "antd";
 import { http } from "4-utils";
+import { WrapLink } from "0-components";
+
+const hanle = name => {
+  console.log(name);
+};
 
 const columns = [
   {
@@ -25,9 +30,11 @@ const columns = [
     key: "status"
   },
   {
-    title: "状态设置",
-    dataIndex: "me",
-    key: "me"
+    title: "基本信息",
+    key: "me",
+    render: (text) => (
+      <WrapLink onClick={()=>hanle(text)}>开启</WrapLink>
+    )
   },
   {
     title: "成员加入提醒",
@@ -46,8 +53,8 @@ const columns = [
   },
   {
     title: "AB测试",
-    dataIndex: "service",
-    key: "service"
+    dataIndex: "test",
+    key: "test"
   },
   {
     title: "操作",
@@ -58,23 +65,41 @@ const columns = [
     title: "数据统计",
     dataIndex: "stats",
     key: "stats",
-    align:"center"
+    align: "center"
   }
 ];
-const data=[]
+const data = [
+  {
+    key: "1",
+    name: "胡彦斌",
+    stats: 32,
+    service: "西湖区湖底公园1号",
+    test: 1,
+    me:1
+  },
+  {
+    key: "2",
+    name: "周杰伦",
+    stats: 32,
+    service: "西湖区湖底公园1号",
+    test: 1,
+    me:1
+  }
+];
+
 class Home extends Component {
   state = {};
-
-  componentDidMount() {
-    console.log(this.props, "lala");
-    http.get("applications").then(response => {
-      console.log(response, "rrr");
-    });
-  }
+  componentDidMount() {}
   render() {
     return (
       <div>
-        <Table columns={columns} dataSource={data} bordered size="middle" />
+        <Table
+          pagination={{ hideOnSinglePage: true }}
+          columns={columns}
+          dataSource={data}
+          bordered
+          size="middle"
+        />
       </div>
     );
   }
