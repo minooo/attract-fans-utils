@@ -639,6 +639,9 @@ button {
   content: "\e917";
   color: #53cc50; }
 
+.textleft .ant-form-item-label {
+  text-align: left; }
+
 .common-full {
   top: 0;
   right: 0;

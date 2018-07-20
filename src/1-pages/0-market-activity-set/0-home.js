@@ -1,15 +1,20 @@
 import React, { Component } from "react";
 import { observer, inject } from "mobx-react";
-import { Table } from "antd";
-import { http } from "4-utils";
+import { Table, Input, Button  } from "antd";
+// import { http } from "4-utils";
 import { WrapLink } from "0-components";
 
+const { Search }= Input;
 const changeStu = data => {
   console.info(data);
 };
 const deleteAct = data => {
   console.info(data);
 };
+ // 获取数据
+const getDate=()=>{
+  // console.info(data);
+}
 const columns = [
   {
     title: "任务名称",
@@ -125,12 +130,42 @@ const data = [
 
 class Home extends Component {
   state = {};
-  componentDidMount() {}
+  componentDidMount() {
+    getDate()
+  }
+
+  // 创建海报
+  setPoster=()=>{
+    const {history}=this.props
+    history.push("/create-task-poster")
+  }
   render() {
     return (
       <div>
+        <div className="h60 font18 pl10 flex r4 ai-center jc-between" style={{backgroundColor:"#f1f1f1"}}>
+        <div>营销活动设置</div>
+        <Button onClick={this.setPoster} className="mr10" type="primary" icon="plus">创建任务海报</Button>
+        </div>
+        <div className="flex ai-center h80">
+        <Search
+          placeholder="请输入搜索内容"
+          enterButton="搜索"
+          size="large"
+          style={{width:"300px"}}
+          onSearch={value => console.log(value)}
+        />
+        <div className="font16 pl20">当前共有<span className="c-main">123</span>个营销活动</div>
+         </div>
         <Table
-          pagination={{ hideOnSinglePage: true }}
+          pagination={{
+            hideOnSinglePage: true,
+            current: 1,
+            pageSize: 10,
+            onChange: () => {
+              console.info(1);
+            },
+            total: 2
+          }}
           columns={columns}
           dataSource={data}
           bordered
