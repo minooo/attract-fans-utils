@@ -24,8 +24,14 @@ class Home extends Component {
   onChange1 = e => {
     console.log(e);
   };
+  // upLode=(flie)=>{
+  //   console.log(flie)
+  // }
+  beforeUpload=(flie)=>{
+    console.log(flie)
+    return false
+  }
   render() {
-    console.log(this.props);
     const { getFieldDecorator } = this.props.form;
     const formItemLayout = {
       labelCol: { span: 4 },
@@ -74,10 +80,12 @@ class Home extends Component {
                     )}
                   </FormItem>
                   <FormItem {...formItemLayout} label="背景">
-                    {getFieldDecorator("CheckboxGroup")(
+                    {getFieldDecorator("upload")(
                       <Upload
-                        action="//jsonplaceholder.typicode.com/posts/"
+                        action="http://er.duduapp.net/web/common/upload_picture"
                         listType="picture"
+                        showUploadList
+                        beforeUpload={this.beforeUpload}
                       >
                         <Button>
                           <Icon type="upload" />上传图片
