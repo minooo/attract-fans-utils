@@ -1,15 +1,15 @@
 import React, { Component } from "react";
-import { Input, Form, Button, message } from "antd";
-import { Loading } from "0-components";
+import { Input, Form, Button } from "antd";
+// import { Loading } from "0-components";
 
 const FormItem = Form.Item;
 const { TextArea } = Input;
 class Member extends Component {
-  state = {submitting:false};
+  state = { submitting: false };
   componentDidMount() {}
   handleSubmit = e => {
     e.preventDefault();
-    const { form, dispatch } = this.props;
+    const { form } = this.props;
     form.validateFieldsAndScroll((err, values) => {
       if (!err) {
         console.info(values);
@@ -35,7 +35,7 @@ class Member extends Component {
       }
     };
     const { getFieldDecorator } = this.props.form;
-    const {submitting} = this.state;
+    const { submitting } = this.state;
     return (
       <Form onSubmit={this.handleSubmit} style={{ marginTop: 8 }}>
         <FormItem
@@ -85,10 +85,10 @@ class Member extends Component {
           )}
         </FormItem>
         <FormItem {...submitFormLayout} style={{ marginTop: 32 }}>
-              <Button type="primary" htmlType="submit" loading={submitting}>
-                提交
-              </Button>
-            </FormItem>
+          <Button type="primary" htmlType="submit" loading={submitting}>
+            提交
+          </Button>
+        </FormItem>
       </Form>
     );
   }
