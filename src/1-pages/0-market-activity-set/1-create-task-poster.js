@@ -26,7 +26,12 @@ const getBase64 = (img, callback) => {
   reader.addEventListener("load", () => callback(reader.result));
   reader.readAsDataURL(img);
 };
-
+const selectCon=(arr)=>{
+  return{
+    is_code:arr.includes("二维码"),
+    is_avatar:arr.includes("头像")
+  }
+}
 class Home extends Component {
   state = {
     wxType: 1,
@@ -50,11 +55,6 @@ class Home extends Component {
       }));
     }
   };
-  // 海报内容改变事件
-  posterConChange = e => {
-    console.log(e);
-  };
-
   // 上传状态改变
   handleChange = (info, type) => {
     // type 1.海报 2.二维码
@@ -66,7 +66,7 @@ class Home extends Component {
       }
       return;
     }
-    console.log(info.file.originFileObj)
+    console.log(info.file.originFileObj);
     if (info.file.status === "done") {
       getBase64(info.file.originFileObj, imageUrl => {
         if (type === 1) {
@@ -152,15 +152,15 @@ class Home extends Component {
       image.addEventListener("load", () => {
         const w = image.width;
         const h = image.height;
-       const param=data.split(",")[1]
-        if (w !== 336 && h !== 252) {
+        const param = data.split(",")[1];
+        if (w !== 164 && h !== 164) {
           message.error("请上传符合尺寸的图片", 2);
         } else {
           axios({
             baseURL: "http://mp.dev.duduapp.net/",
             url: "upload/image",
             method: "post",
-            data:param
+            data: param
           });
         }
       });
@@ -168,14 +168,54 @@ class Home extends Component {
     });
     reader.readAsDataURL(file);
   };
-  codeStart=()=>{
-    // this.setState(()=>({
-    //   codeStart
-    // }))
-  }
+  // 预览图片需要数据
+  getValue = (value, type) => {
+    switch (type) {
+      case 1:
+        this.setState(() => ({
+          posterCon: value
+        }));
+      case 2:
+        this.setState(() => ({
+          code_start: value
+        }));
+      case 3:
+        this.setState(() => ({
+          code_end: value
+        }));
+      case 4:
+        this.setState(() => ({
+          code_font_size: value
+        }));
+      case 5:
+        this.setState(() => ({
+          code_font_color: value
+        }));
+    }
+  };
   removeImg = () => {
     console.log(123);
   };
+  // 预览图片
+  onPreview=()=>{
+    const {code_font_color,code_font_size,code_end,posterCon,code_start}=this.state
+    if(!code_font_size){
+      message.error("缺少字体大小",2)
+      return
+    }else if(!code_font_color){
+      message.error("缺少字体颜色",2)
+      return
+    }
+    else if(!code_end){
+      message.error("缺少字体颜色",2)
+      return
+    }
+    else if(!code_start){
+      message.error("缺少字体颜色",2)
+      return
+    }
+    // ...
+  }
   render() {
     const { getFieldDecorator } = this.props.form;
     const {
@@ -240,7 +280,7 @@ class Home extends Component {
                     {getFieldDecorator("posterCon")(
                       <CheckboxGroup
                         options={PosterOptions}
-                        onChange={this.posterConChange}
+                        onChange={value => this.getValue(value, 1)}
                       />
                     )}
                   </FormItem>
@@ -249,9 +289,9 @@ class Home extends Component {
                       rules: [{ required: true, message: "请上传图片" }]
                     })(
                       <Upload
-                        // action="http://mp.dev.duduapp.net/upload/image"
+                        action="http://mp.dev.duduapp.net/upload/image"
                         listType="picture"
-                        customRequest={this.customRequest}
+                        // customRequest={this.customRequest}
                         showUploadList={false}
                         // onChange={info => this.handleChange(info, 1)}
                         // beforeUpload={(file, fileList) =>
@@ -357,14 +397,19 @@ class Home extends Component {
                                 rules: [
                                   { required: true, message: "请填写开始值" }
                                 ]
-                              })(<InputNumber onchange={this.codeStart} placeholder="开始值" />)}
+                              })(
+                                <InputNumber
+                                  onChange={value => this.getValue(value, 2)}
+                                  placeholder="开始值"
+                                />
+                              )}
                             </FormItem>
                             <FormItem {...formItemLayoutSamll}>
                               {getFieldDecorator("code_end", {
                                 rules: [
                                   { required: true, message: "请填写结束值" }
                                 ]
-                              })(<InputNumber placeholder="结束值" />)}
+                              })(<InputNumber placeholder="结束值" onChange={value => this.getValue(value, 3)} />)}
                             </FormItem>
                           </div>
                           <div className="flex">
@@ -375,9 +420,9 @@ class Home extends Component {
                                 ]
                               })(
                                 <InputNumber
+                                  onChange={value => this.getValue(value, 4)}
                                   placeholder="字体大小"
                                   style={{
-                                    fontSize: "12px",
                                     marginRight: "10px"
                                   }}
                                 />
@@ -388,12 +433,7 @@ class Home extends Component {
                                 rules: [
                                   { required: true, message: "请填写字体颜色" }
                                 ]
-                              })(
-                                <Input
-                                  placeholder="字体颜色"
-                                  style={{ fontSize: "12px" }}
-                                />
-                              )}
+                              })(<Input onChange={value => this.getValue(value, 5)} placeholder="字体颜色" />)}
                             </FormItem>
                           </div>
                         </div>
