@@ -128,3 +128,6 @@ class CommonLayout extends Component {
 }
 
 export default withRouter(inject("menuCollapsed")(observer(CommonLayout)));
+
+
+

@@ -1,103 +1,454 @@
 import React, { Component } from "react";
 import { observer, inject } from "mobx-react";
-import { Radio, Form, Input, Checkbox, Upload, Button, Icon } from "antd";
+import axios from "axios";
+import {
+  Radio,
+  Form,
+  Input,
+  Checkbox,
+  Upload,
+  Button,
+  Icon,
+  Switch,
+  InputNumber,
+  message
+} from "antd";
 import { http } from "4-utils";
 import { Nav } from "0-components";
 
 const RadioGroup = Radio.Group;
 const FormItem = Form.Item;
 const RadioButton = Radio.Button;
+const { TextArea } = Input;
 const CheckboxGroup = Checkbox.Group;
-const plainOptions = ["二维码", "头像", "昵称"];
+const getBase64 = (img, callback) => {
+  const reader = new FileReader();
+  reader.addEventListener("load", () => callback(reader.result));
+  reader.readAsDataURL(img);
+};
 
 class Home extends Component {
-  state = {};
-  // componentDidMount() {
-  //   http.get("applications").then(response => {
-  //     console.log(response, "rrr");
-  //   });
-  // }
-  // 当前选中
-  onChange = () => {
-    // 当前选中
+  state = {
+    wxType: 1,
+    PosterOptions: ["二维码", "头像", "昵称"],
+    imageLoading: false,
+    ercodeLoading: false,
+    isSize: true
   };
-  onChange1 = e => {
+  // 当前选中 1.服务号 2.订阅号
+  wxChange = e => {
+    const { value } = e.target;
+    if (value === 1) {
+      this.setState(() => ({
+        wxType: value,
+        PosterOptions: ["二维码", "头像", "昵称"]
+      }));
+    } else {
+      this.setState(() => ({
+        wxType: value,
+        PosterOptions: ["头像", "昵称"]
+      }));
+    }
+  };
+  // 海报内容改变事件
+  posterConChange = e => {
     console.log(e);
   };
-  // upLode=(flie)=>{
-  //   console.log(flie)
-  // }
-  beforeUpload=(flie)=>{
-    console.log(flie)
-    return false
+
+  // 上传状态改变
+  handleChange = (info, type) => {
+    // type 1.海报 2.二维码
+    if (info.file.status === "uploading") {
+      if (type === 1) {
+        this.setState({ imageLoading: true });
+      } else {
+        this.setState({ ercodeLoading: true });
+      }
+      return;
+    }
+    console.log(info.file.originFileObj)
+    if (info.file.status === "done") {
+      getBase64(info.file.originFileObj, imageUrl => {
+        if (type === 1) {
+          this.setState({
+            imageUrl,
+            imageLoading: false
+          });
+        } else {
+          this.setState({
+            ercodeUrl: imageUrl,
+            ercodeLoading: false
+          });
+        }
+      });
+    }
+  };
+  // 验证图片
+  beforeUpload = (file, fileList, width, height) => {
+    const isImage = file.type === "image/jpeg" || "image/png";
+    if (!isImage) {
+      message.error("请上传png/jpg类型的图片", 2);
+    }
+    const isLt200k = file.size / 1024 < 200;
+    if (!isLt200k) {
+      message.error("图片要小于200k");
+    }
+    const reader = new FileReader();
+    //读取图片数据
+    reader.addEventListener("load", e => {
+      const data = e.target.result;
+      //加载图片获取图片真实宽度和高度
+      const image = new Image();
+      image.addEventListener("load", () => {
+        const w = image.width;
+        const h = image.height;
+        if (w !== width && h !== height) {
+          message.error("请上传符合尺寸的图片", 2, () => {
+            console.info(111);
+            this.setState(
+              pre => ({
+                isSize: !pre.isSize
+              }),
+              () => {
+                console.info(1);
+              }
+            );
+          });
+        }
+      });
+      image.src = data;
+    });
+    reader.readAsDataURL(file);
+    // console.log(this.state.isSize);
+    // console.log(isImage && isLt200k && this.state.isSize);
+    return isImage && isLt200k && this.state.isSize;
+  };
+  handleSubmit = e => {
+    e.preventDefault();
+    this.props.form.validateFields((err, values) => {
+      if (!err) {
+        console.log("Received values of form: ", values);
+      }
+    });
+  };
+  customRequest = data => {
+    const { file } = data;
+    const isImage = file.type === "image/jpeg" || "image/png";
+    if (!isImage) {
+      message.error("请上传png/jpg类型的图片", 2);
+      return;
+    }
+    const isLt200k = file.size / 1024 < 200;
+    if (!isLt200k) {
+      message.error("图片要小于200k");
+      return;
+    }
+    const reader = new FileReader();
+    //读取图片数据
+    reader.addEventListener("load", e => {
+      const data = e.target.result;
+      //加载图片获取图片真实宽度和高度
+      const image = new Image();
+      image.addEventListener("load", () => {
+        const w = image.width;
+        const h = image.height;
+       const param=data.split(",")[1]
+        if (w !== 336 && h !== 252) {
+          message.error("请上传符合尺寸的图片", 2);
+        } else {
+          axios({
+            baseURL: "http://mp.dev.duduapp.net/",
+            url: "upload/image",
+            method: "post",
+            data:param
+          });
+        }
+      });
+      image.src = data;
+    });
+    reader.readAsDataURL(file);
+  };
+  codeStart=()=>{
+    // this.setState(()=>({
+    //   codeStart
+    // }))
   }
+  removeImg = () => {
+    console.log(123);
+  };
   render() {
     const { getFieldDecorator } = this.props.form;
+    const {
+      wxType,
+      PosterOptions,
+      imageLoading,
+      ercodeLoading,
+      imageUrl,
+      ercodeUrl
+    } = this.state;
     const formItemLayout = {
       labelCol: { span: 4 },
       wrapperCol: { span: 20 }
     };
+    const formItemLayoutSamll = {
+      labelCol: { span: 5 },
+      wrapperCol: { span: 19 }
+    };
     return (
       <div>
         <Nav />
+        {/* 表单开始 */}
         <div className="mt30 plr25 border-default textleft">
-          <Form style={{ maxWidth: "900px", paddingTop: "40px" }}>
+          <Form
+            style={{ maxWidth: "900px", paddingTop: "40px" }}
+            onSubmit={this.handleSubmit}
+          >
+            {/*1. 选择公众号类型 */}
             <FormItem {...formItemLayout} label="选择公众号类型">
-              {getFieldDecorator("radio-group", {
-                rules: [
-                  { required: true, message: "Please select your country!" }
-                ]
+              {getFieldDecorator("type", {
+                rules: [{ required: true, message: "请选择公众号类型" }]
               })(
-                <RadioGroup className="inline-block" onChange={this.onChange}>
+                <RadioGroup className="inline-block" onChange={this.wxChange}>
                   <Radio value={1}>服务号</Radio>
                   <Radio value={2}>订阅号</Radio>
                 </RadioGroup>
               )}
             </FormItem>
+            {/*2. 海报名称 */}
             <FormItem {...formItemLayout} label="海报名称">
-              {getFieldDecorator("input", {
+              {getFieldDecorator("title", {
                 rules: [{ required: true, message: "请填写海报名称" }]
               })(<Input style={{ width: "250px" }} placeholder="海报名称" />)}
             </FormItem>
+            {/*3. 海报上传与预览 */}
             <div className="flex">
               <div className="ant-col-4">
                 <div className="ant-form-item-required c333">海报设计</div>
               </div>
+              {/*3.1 海报预览 */}
               <div className="flex equal">
                 <div
                   className="plr20 ptb20 border-default mr20"
-                  style={{ width: "320px", height: "540px" }}
+                  style={{ width: "320px", minHeight: "540px" }}
                 >
-                  <img className="h-100 w-100" src="" alt="" />
+                  <img style={{ height: "470px" }} src="" alt="" />
                 </div>
+                {/*3.2 海报上传 */}
                 <div className="plr20 ptb20 border-default equal">
-                  <FormItem {...formItemLayout} label="元素">
-                    {getFieldDecorator("CheckboxGroup")(
+                  {/*3.3 选择海报元素 */}
+                  <FormItem {...formItemLayoutSamll} label="元素">
+                    {getFieldDecorator("posterCon")(
                       <CheckboxGroup
-                        options={plainOptions}
-                        onChange={this.onChange1}
+                        options={PosterOptions}
+                        onChange={this.posterConChange}
                       />
                     )}
                   </FormItem>
-                  <FormItem {...formItemLayout} label="背景">
-                    {getFieldDecorator("upload")(
+                  <FormItem {...formItemLayoutSamll} label="背景">
+                    {getFieldDecorator("image", {
+                      rules: [{ required: true, message: "请上传图片" }]
+                    })(
                       <Upload
-                        action="http://er.duduapp.net/web/common/upload_picture"
+                        // action="http://mp.dev.duduapp.net/upload/image"
                         listType="picture"
-                        showUploadList
-                        beforeUpload={this.beforeUpload}
+                        customRequest={this.customRequest}
+                        showUploadList={false}
+                        // onChange={info => this.handleChange(info, 1)}
+                        // beforeUpload={(file, fileList) =>
+                        //   this.beforeUpload(file, fileList, 640, 1080)
+                        // }
                       >
                         <Button>
-                          <Icon type="upload" />上传图片
+                          <Icon
+                            type={`${imageLoading ? "loading" : "upload"}`}
+                          />上传图片
                         </Button>
-                        <div>海报尺寸：640X1080px；</div>
-                        <div>大小200kb以内，支持png/jpg文件</div>
                       </Upload>
                     )}
                   </FormItem>
+                  {/* 上传的图片缩略图 */}
+                  {imageUrl && (
+                    <div
+                      className="relative mb10"
+                      style={{ width: "80px", height: "135px" }}
+                    >
+                      <img className="w-100 h-100" src={imageUrl} alt="" />
+                      <div
+                        onClick={this.removeImg}
+                        className="absolute font20 lh100 common-curson"
+                        style={{
+                          backgroundColor: "none",
+                          border: "none",
+                          top: "-10px",
+                          right: "-10px"
+                        }}
+                      >
+                        <Icon type="close-circle" />
+                      </div>
+                    </div>
+                  )}
+                  <div className="common-warning">海报尺寸：640X1080px；</div>
+                  <div className="common-warning">
+                    大小200kb以内，支持png/jpg文件
+                  </div>
+                  {/* 订阅号专属 */}
+                  {wxType === 2 && (
+                    <div className="pt30">
+                      <FormItem {...formItemLayoutSamll} label="二维码">
+                        {getFieldDecorator("ercode", {
+                          rules: [{ required: true, message: "请上传二维码" }]
+                        })(
+                          <Upload
+                            action="http://mp.dev.duduapp.net/upload/image"
+                            listType="picture"
+                            showUploadList={false}
+                            onChange={info => this.handleChange(info, 2)}
+                            beforeUpload={(file, fileList) =>
+                              this.beforeUpload(file, fileList, 200, 200)
+                            }
+                          >
+                            <Button>
+                              <Icon
+                                type={`${ercodeLoading ? "loading" : "upload"}`}
+                              />上传二维码
+                            </Button>
+                          </Upload>
+                        )}
+                      </FormItem>
+                      {ercodeUrl && (
+                        <div
+                          className="relative mb10"
+                          style={{ width: "50px", height: "50px" }}
+                        >
+                          <img
+                            className="w-100 h-100"
+                            src="http://p3oeo2qki.bkt.clouddn.com/18-4-14/95596364.jpg"
+                            alt=""
+                          />
+                          <div
+                            onClick={this.removeImg}
+                            className="absolute font20 lh100 common-curson"
+                            style={{
+                              top: "-10px",
+                              right: "-10px"
+                            }}
+                          >
+                            <Icon type="close-circle" />
+                          </div>
+                        </div>
+                      )}
+                      <div className="common-warning">
+                        二维码尺寸：200X200px；
+                      </div>
+                      <div className="common-warning">
+                        大小200kb以内，支持png/jpg文件
+                      </div>
+                      <div className="flex">
+                        <div className="ant-col-5 ant-form-item-label c333 ant-form-item-required">
+                          邀请码:
+                        </div>
+                        <div>
+                          <div className="flex">
+                            <FormItem
+                              style={{ marginRight: "10px" }}
+                              {...formItemLayoutSamll}
+                            >
+                              {getFieldDecorator("code_start", {
+                                rules: [
+                                  { required: true, message: "请填写开始值" }
+                                ]
+                              })(<InputNumber onchange={this.codeStart} placeholder="开始值" />)}
+                            </FormItem>
+                            <FormItem {...formItemLayoutSamll}>
+                              {getFieldDecorator("code_end", {
+                                rules: [
+                                  { required: true, message: "请填写结束值" }
+                                ]
+                              })(<InputNumber placeholder="结束值" />)}
+                            </FormItem>
+                          </div>
+                          <div className="flex">
+                            <FormItem {...formItemLayoutSamll}>
+                              {getFieldDecorator("code_font_size", {
+                                rules: [
+                                  { required: true, message: "请填写字体大小" }
+                                ]
+                              })(
+                                <InputNumber
+                                  placeholder="字体大小"
+                                  style={{
+                                    fontSize: "12px",
+                                    marginRight: "10px"
+                                  }}
+                                />
+                              )}
+                            </FormItem>
+                            <FormItem {...formItemLayoutSamll}>
+                              {getFieldDecorator("code_font_color", {
+                                rules: [
+                                  { required: true, message: "请填写字体颜色" }
+                                ]
+                              })(
+                                <Input
+                                  placeholder="字体颜色"
+                                  style={{ fontSize: "12px" }}
+                                />
+                              )}
+                            </FormItem>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  <Button className="mt30" type="primary">
+                    预览
+                  </Button>
                 </div>
               </div>
             </div>
+            <FormItem
+              style={{ marginTop: "20px" }}
+              {...formItemLayout}
+              label="自动生成海报"
+            >
+              {getFieldDecorator("is_auto")(<Switch />)}
+              <div className="c666 font12">
+                活动开始时开启，关闭则不会生成海报
+              </div>
+            </FormItem>
+            <FormItem {...formItemLayout} label="海报关键字">
+              {getFieldDecorator("keyword", {
+                rules: [{ required: true, message: "请填写海报关键字" }]
+              })(
+                <Input
+                  style={{ width: "250px" }}
+                  placeholder="请填写海报关键字"
+                />
+              )}
+              <div className="c666 font12">
+                海报关键字是在公众号回复关键词可弹出海报，关键词建议为汉字
+              </div>
+            </FormItem>
+            <FormItem {...formItemLayout} label="生成海报提示">
+              {getFieldDecorator("reply_content", {
+                rules: [{ required: true, message: "请填写生成海报提示" }]
+              })(
+                <TextArea
+                  maxLength={200}
+                  style={{ resize: "none" }}
+                  rows={5}
+                  placeholder="文字自定义，主要介绍活动奖品以及玩法，同时可添加活动攻略超链接、添加排行榜超链接、添加直接购买链接。150个字符以内。"
+                />
+              )}
+              <div className="c666 font12">
+                说明：粉丝点击菜单或者回复关键词获取海报之前弹出文字提示
+              </div>
+            </FormItem>
+            <FormItem wrapperCol={{ span: 12, offset: 4 }}>
+              <Button type="primary" htmlType="submit">
+                提交
+              </Button>
+            </FormItem>
           </Form>
         </div>
       </div>
