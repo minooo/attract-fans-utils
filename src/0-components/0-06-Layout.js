@@ -1,6 +1,6 @@
 import React, { Fragment, Component } from "react";
 import { Layout, Menu, Icon } from "antd";
-import { withRouter } from "react-router-dom"
+import { withRouter } from "react-router-dom";
 import { observer, inject } from "mobx-react";
 import { WrapLink } from "0-components";
 import { common } from "4-utils";
@@ -36,47 +36,26 @@ const keysArr = path => {
 };
 
 class CommonLayout extends Component {
-  constructor(props){
-    super(props)
+  constructor(props) {
+    super(props);
     const { location } = this.props;
     const arr = keysArr(location.pathname);
-    console.log(arr[0], 'ciao')
+    console.log(arr[0], "ciao");
     this.state = {
       handleOpenKeys: arr[0]
-    }
+    };
   }
   onOpenChange = openKeys => {
-    console.log(openKeys, "openkey")
-    this.setState(() => ({ handleOpenKeys: [...openKeys] }))
-  }
+    console.log(openKeys, "openkey");
+    this.setState(() => ({ handleOpenKeys: [...openKeys] }));
+  };
   handleClick = e => {
-    const { history } = this.props
-    const key = e.key.slice(0, 1)
-    this.setState(() => ({ handleOpenKeys: [key] }))
+    const { history } = this.props;
+    const key = e.key.slice(0, 1);
+    this.setState(() => ({ handleOpenKeys: [key] }));
     switch (e.key) {
-      case "00":
+      case "0":
         history.push("/");
-        break;
-      case "01":
-        history.push("/create-task-poster");
-        break;
-      case "02":
-        history.push("/base-info-set");
-        break;
-      case "03":
-        history.push("/member-join-tip");
-        break;
-      case "04":
-        history.push("/first-task-ok");
-        break;
-      case "05":
-        history.push("/second-task-ok");
-        break;
-      case "06":
-        history.push("/third-task-ok");
-        break;
-      case "07":
-        history.push("/message-reply");
         break;
       case "10":
         history.push("/users-analyze");
@@ -93,7 +72,7 @@ class CommonLayout extends Component {
       default:
         console.info("menu click");
     }
-  }
+  };
   onResponse = collapsed => {
     const { menuCollapsed } = this.props;
     menuCollapsed.setCollapsed(collapsed);
@@ -103,10 +82,12 @@ class CommonLayout extends Component {
     menuCollapsed.setCollapsed(!menuCollapsed.isCollapsed);
   };
   render() {
-    const { handleOpenKeys } = this.state
+    const { handleOpenKeys } = this.state;
     const { menuCollapsed, location, children } = this.props;
     const arr = keysArr(location.pathname);
-    const menuProps = menuCollapsed.isCollapsed ? {} : { openKeys: handleOpenKeys || arr[0] }
+    const menuProps = menuCollapsed.isCollapsed
+      ? {}
+      : { openKeys: handleOpenKeys || arr[0] };
     common.setTitle(arr[2]);
     // if (!user || user) return <LoadingFetch />
     return (
@@ -120,7 +101,12 @@ class CommonLayout extends Component {
             onCollapse={this.onResponse}
             className="admin-layout-sider"
             width={220}
-            style={{ overflow: "auto", height: "100vh", position: "fixed", left: 0 }}
+            style={{
+              overflow: "auto",
+              height: "100vh",
+              position: "fixed",
+              left: 0
+            }}
           >
             <WrapLink
               style={{ background: "#002140" }}
@@ -129,7 +115,9 @@ class CommonLayout extends Component {
             >
               <div
                 className={`admin-logo ${
-                  menuCollapsed.isCollapsed ? "admin-logo-collapsed" : "admin-logo-normal"
+                  menuCollapsed.isCollapsed
+                    ? "admin-logo-collapsed"
+                    : "admin-logo-normal"
                 }`}
               />
             </WrapLink>
@@ -142,7 +130,11 @@ class CommonLayout extends Component {
               selectedKeys={arr[1]}
               onClick={this.handleClick}
             >
-              <SubMenu
+              <Menu.Item key="0">
+                <Icon type="form" />
+                <span className="nav-text">营销活动设置</span>
+              </Menu.Item>
+              {/* <SubMenu
                 key="0"
                 title={
                   <span>
@@ -159,7 +151,7 @@ class CommonLayout extends Component {
                 <Menu.Item key="05">二阶任务完成</Menu.Item>
                 <Menu.Item key="06">三阶任务完成</Menu.Item>
                 <Menu.Item key="07">客服消息回复</Menu.Item>
-              </SubMenu>
+              </SubMenu> */}
               <SubMenu
                 key="1"
                 title={
@@ -179,8 +171,14 @@ class CommonLayout extends Component {
               </Menu.Item>
             </Menu>
           </Sider>
-          <Layout style={{ marginLeft: menuCollapsed.isCollapsed ? 80 : 220 }} className="transition-margin">
-            <Header style={{ padding: "0 24px 0 0", backgroundColor: "#fff" }} className="flex jc-between ai-center admin-head-shadow">
+          <Layout
+            style={{ marginLeft: menuCollapsed.isCollapsed ? 80 : 220 }}
+            className="transition-margin"
+          >
+            <Header
+              style={{ padding: "0 24px 0 0", backgroundColor: "#fff" }}
+              className="flex jc-between ai-center admin-head-shadow"
+            >
               <Icon
                 className="admin-com-trigger"
                 type={menuCollapsed.isCollapsed ? "menu-unfold" : "menu-fold"}
@@ -189,7 +187,7 @@ class CommonLayout extends Component {
               <div>shadow</div>
             </Header>
             <div className="admin-common-content plr25 ptb20 bg-white">
-              { children }
+              {children}
             </div>
             <Footer style={{ textAlign: "center" }}>
               嘟嘟插件中心 Copyright © 2017-2018 DuduApp Ltd All Rights Reserved
@@ -202,4 +200,4 @@ class CommonLayout extends Component {
   }
 }
 
-export default withRouter(inject("menuCollapsed")(observer(CommonLayout)))
+export default withRouter(inject("menuCollapsed")(observer(CommonLayout)));

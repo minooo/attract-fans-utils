@@ -15,6 +15,7 @@ export default types
   .actions(self => ({
     getUser(user) {
         self = user
+        return self.name
     },
     changeName(name) {
       self.name = name;

@@ -19,3 +19,14 @@ function Header() {
 
 export default Header;
 ```
+
+
+## Nav使用
+
+一共有三个参数
+```js
+finish: 当前的活动是否开启，开启之后不能在进入基本设置页面。
+poster_id：任务的id，只有创建海报页面需要。
+submit：当前页面是否提交。
+```
+

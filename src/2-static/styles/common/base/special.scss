@@ -58,7 +58,13 @@
   width: 200px;
   height: 200px;
 }
-
+.common-warning{
+  color:#f5222d;
+  margin: 0 0 0 20.83333333%
+}
+.common-curson{
+  cursor: pointer;
+}
 // admin 样式
 .admin-right-border {
   border-right: 1px solid #e9e9e9;

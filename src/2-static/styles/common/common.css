@@ -639,6 +639,9 @@ button {
   content: "\e917";
   color: #53cc50; }
 
+.textleft .ant-form-item-label {
+  text-align: left; }
+
 .common-full {
   top: 0;
   right: 0;
@@ -697,6 +700,13 @@ button {
   background-size: 100%;
   width: 200px;
   height: 200px; }
+
+.common-warning {
+  color: #f5222d;
+  margin: 0 0 0 20.83333333%; }
+
+.common-curson {
+  cursor: pointer; }
 
 .admin-right-border {
   border-right: 1px solid #e9e9e9; }
