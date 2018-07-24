@@ -7,43 +7,44 @@ const config = [
   {
     text: "基本信息设置",
     path: "/base-info-set",
-    key: "1"
+    key: "0"
   },
   {
     text: "成员加入提醒",
     path: "/member-join-tip",
-    key: "2"
+    key: "1"
   },
   {
     text: "一阶任务完成",
     path: "/first-task-ok",
-    key: "3"
+    key: "2"
   },
   {
     text: "二阶任务完成",
     path: "/second-task-ok",
-    key: "4"
+    key: "3"
   },
   {
     text: "三阶任务完成",
     path: "/third-task-ok",
-    key: "5"
+    key: "4"
   },
   {
     text: "客服消息回复",
     path: "/message-reply",
-    key: "6"
+    key: "5"
   },
   {
     text: "添加AB测试",
     path: "/8-ab-test",
-    key: "7"
+    key: "6"
   }
 ];
 
 class CommonLayout extends Component {
   state = { visible: false };
   // 取消弹出框
+
   hideModal = () => {
     this.setState({
       visible: false
@@ -53,7 +54,7 @@ class CommonLayout extends Component {
   handleClick = e => {
     const { id } = this.props.match.params;
     const { submit, poster_id } = this.props;
-    if (!id || !poster_id) {
+    if (!id && !poster_id) {
       message.error("你还未创建海报", 2);
     } else if (!submit) {
       this.setState({
@@ -61,15 +62,20 @@ class CommonLayout extends Component {
         key: e.key
       });
     } else {
-      this.routerLink();
+      this.setState(
+        {
+          key: e.key
+        },
+        () => this.routerLink()
+      );
     }
   };
   // 路由跳转事件
   routerLink = () => {
-    const { finish, history, poster_id } = this.props;
+    const { finish, history, poster_id, location } = this.props;
     const { id } = this.props.match.params;
     const { key } = this.state;
-    if (finish && parseInt(key) === 1) {
+    if (finish && parseInt(key) === 0) {
       this.setState({
         visible: false
       });
@@ -79,7 +85,10 @@ class CommonLayout extends Component {
         visible: false
       });
       const paramId = id || poster_id;
-      history.push(`${config[parseInt(key)].path}_${paramId}`);
+      const path=config[parseInt(key)].path
+      location.pathname.includes("/create-task-poster")
+        ? history.replace(`${path}_${paramId}`)
+        : history.push(`${path}_${paramId}`);
     }
   };
 
@@ -107,6 +116,7 @@ class CommonLayout extends Component {
           mode="horizontal"
           defaultSelectedKeys={["0"]}
           selectedKeys={Current}
+          style={{display:"flex",justifyContent:"center"}}
         >
           {config.map(item => (
             <Menu.Item key={item.key}>{item.text}</Menu.Item>
@@ -128,6 +138,3 @@ class CommonLayout extends Component {
 }
 
 export default withRouter(inject("menuCollapsed")(observer(CommonLayout)));
-
-
-

@@ -702,7 +702,8 @@ button {
   height: 200px; }
 
 .common-warning {
-  color: #f5222d; }
+  color: #f5222d;
+  margin: 0 0 0 20.83333333%; }
 
 .common-curson {
   cursor: pointer; }

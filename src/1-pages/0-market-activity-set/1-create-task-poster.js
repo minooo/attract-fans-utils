@@ -26,19 +26,19 @@ const getBase64 = (img, callback) => {
   reader.addEventListener("load", () => callback(reader.result));
   reader.readAsDataURL(img);
 };
-const selectCon=(arr)=>{
-  return{
-    is_code:arr.includes("二维码"),
-    is_avatar:arr.includes("头像")
-  }
-}
+const selectCon = arr => {
+  return {
+    is_code: arr.includes("二维码"),
+    is_avatar: arr.includes("头像")
+  };
+};
 class Home extends Component {
   state = {
     wxType: 1,
     PosterOptions: ["二维码", "头像", "昵称"],
     imageLoading: false,
     ercodeLoading: false,
-    isSize: true
+    poster_id: null
   };
   // 当前选中 1.服务号 2.订阅号
   wxChange = e => {
@@ -124,6 +124,10 @@ class Home extends Component {
     return isImage && isLt200k && this.state.isSize;
   };
   handleSubmit = e => {
+    this.setState(() => ({
+      poster_id: 1,
+      submit: true
+    }));
     e.preventDefault();
     this.props.form.validateFields((err, values) => {
       if (!err) {
@@ -152,15 +156,14 @@ class Home extends Component {
       image.addEventListener("load", () => {
         const w = image.width;
         const h = image.height;
-        const param = data.split(",")[1];
-        if (w !== 164 && h !== 164) {
+        if (w !== 208 && h !== 370) {
           message.error("请上传符合尺寸的图片", 2);
         } else {
           axios({
-            baseURL: "http://mp.dev.duduapp.net/",
+            baseURL: "http://mp.duduapp.net/",
             url: "upload/image",
             method: "post",
-            data: param
+            data: file
           });
         }
       });
@@ -197,25 +200,29 @@ class Home extends Component {
     console.log(123);
   };
   // 预览图片
-  onPreview=()=>{
-    const {code_font_color,code_font_size,code_end,posterCon,code_start}=this.state
-    if(!code_font_size){
-      message.error("缺少字体大小",2)
-      return
-    }else if(!code_font_color){
-      message.error("缺少字体颜色",2)
-      return
-    }
-    else if(!code_end){
-      message.error("缺少字体颜色",2)
-      return
-    }
-    else if(!code_start){
-      message.error("缺少字体颜色",2)
-      return
+  onPreview = () => {
+    const {
+      code_font_color,
+      code_font_size,
+      code_end,
+      posterCon,
+      code_start
+    } = this.state;
+    if (!code_font_size) {
+      message.error("缺少字体大小", 2);
+      return;
+    } else if (!code_font_color) {
+      message.error("缺少字体颜色", 2);
+      return;
+    } else if (!code_end) {
+      message.error("缺少字体颜色", 2);
+      return;
+    } else if (!code_start) {
+      message.error("缺少字体颜色", 2);
+      return;
     }
     // ...
-  }
+  };
   render() {
     const { getFieldDecorator } = this.props.form;
     const {
@@ -224,11 +231,13 @@ class Home extends Component {
       imageLoading,
       ercodeLoading,
       imageUrl,
-      ercodeUrl
+      ercodeUrl,
+      poster_id,
+      submit
     } = this.state;
     const formItemLayout = {
       labelCol: { span: 4 },
-      wrapperCol: { span: 20 }
+      wrapperCol: { span: 18 }
     };
     const formItemLayoutSamll = {
       labelCol: { span: 5 },
@@ -236,11 +245,11 @@ class Home extends Component {
     };
     return (
       <div>
-        <Nav />
+        <Nav poster_id={poster_id} submit={submit} />
         {/* 表单开始 */}
-        <div className="mt30 plr25 border-default textleft">
+        <div className="mt30 plr25 border-default flex jc-center">
           <Form
-            style={{ maxWidth: "900px", paddingTop: "40px" }}
+            style={{ width: "900px", paddingTop: "40px" }}
             onSubmit={this.handleSubmit}
           >
             {/*1. 选择公众号类型 */}
@@ -262,8 +271,8 @@ class Home extends Component {
             </FormItem>
             {/*3. 海报上传与预览 */}
             <div className="flex">
-              <div className="ant-col-4">
-                <div className="ant-form-item-required c333">海报设计</div>
+              <div className="ant-col-4 ant-form-item-label">
+                <label className="ant-form-item-required c333 text-right">海报设计</label>
               </div>
               {/*3.1 海报预览 */}
               <div className="flex equal">
@@ -289,7 +298,7 @@ class Home extends Component {
                       rules: [{ required: true, message: "请上传图片" }]
                     })(
                       <Upload
-                        action="http://mp.dev.duduapp.net/upload/image"
+                        action="http://mp.duduapp.net/upload/image"
                         listType="picture"
                         // customRequest={this.customRequest}
                         showUploadList={false}
@@ -384,8 +393,8 @@ class Home extends Component {
                         大小200kb以内，支持png/jpg文件
                       </div>
                       <div className="flex">
-                        <div className="ant-col-5 ant-form-item-label c333 ant-form-item-required">
-                          邀请码:
+                        <div className="ant-col-5 ant-form-item-label c333">
+                         <label className="ant-form-item-required">邀请码</label>
                         </div>
                         <div>
                           <div className="flex">
@@ -409,7 +418,12 @@ class Home extends Component {
                                 rules: [
                                   { required: true, message: "请填写结束值" }
                                 ]
-                              })(<InputNumber placeholder="结束值" onChange={value => this.getValue(value, 3)} />)}
+                              })(
+                                <InputNumber
+                                  placeholder="结束值"
+                                  onChange={value => this.getValue(value, 3)}
+                                />
+                              )}
                             </FormItem>
                           </div>
                           <div className="flex">
@@ -433,14 +447,19 @@ class Home extends Component {
                                 rules: [
                                   { required: true, message: "请填写字体颜色" }
                                 ]
-                              })(<Input onChange={value => this.getValue(value, 5)} placeholder="字体颜色" />)}
+                              })(
+                                <Input
+                                  onChange={value => this.getValue(value, 5)}
+                                  placeholder="字体颜色"
+                                />
+                              )}
                             </FormItem>
                           </div>
                         </div>
                       </div>
                     </div>
                   )}
-                  <Button className="mt30" type="primary">
+                  <Button className="mt30 ant-col-offset-5" type="primary">
                     预览
                   </Button>
                 </div>
