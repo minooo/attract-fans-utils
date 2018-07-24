@@ -1,15 +1,36 @@
 import React, { Component } from "react";
-import { Input, Form, Button } from "antd";
+import { Input, Form, Button, Upload, Icon, Modal } from "antd";
 
 const FormItem = Form.Item;
 const { TextArea } = Input;
 
 class Message extends Component {
-  state = { submitting: false };
+  state = {
+    submitting: false,
+    previewVisible: false,
+    previewImage: "",
+    fileList: []
+  };
   componentDidMount() {}
   handleSubmit = e => {
     e.preventDefault();
   };
+  // 处理预览
+  handlePreview = file => {
+    console.info(file);
+    this.setState({
+      previewImage: file.url || file.thumbUrl,
+      previewVisible: true
+    });
+  };
+  // 处理预览取消
+  handleCancel = () => this.setState({ previewVisible: false });
+  // 处理上传图片
+  handleChange = ({ fileList }) => {
+    console.info(fileList);
+    this.setState({ fileList });
+  };
+
   render() {
     const formItemLayout = {
       labelCol: {
@@ -29,7 +50,13 @@ class Message extends Component {
       }
     };
     const { getFieldDecorator } = this.props.form;
-    const { submitting } = this.state;
+    const { submitting, previewVisible, previewImage, fileList } = this.state;
+    const uploadButton = (
+      <div>
+        <Icon type="plus" className=" font32 c999" />
+        <div className=" mt10 c666">Upload</div>
+      </div>
+    );
     return (
       <Form onSubmit={this.handleSubmit} style={{ marginTop: 8 }}>
         <FormItem {...formItemLayout} label="关注自动回复" extra="扫码自动回复">
@@ -127,6 +154,29 @@ class Message extends Component {
               rows={3}
             />
           )}
+        </FormItem>
+        <FormItem
+          {...formItemLayout}
+          label="任务完成推送"
+          extra="任务完成后推送图片。"
+        >
+          <Upload
+            action="http://mp.duduapp.net/upload/image"
+            listType="picture-card"
+            fileList={fileList}
+            accept="image/*"
+            onPreview={this.handlePreview}
+            onChange={this.handleChange}
+          >
+            {fileList.length >= 1 ? null : uploadButton}
+          </Upload>
+          <Modal
+            visible={previewVisible}
+            footer={null}
+            onCancel={this.handleCancel}
+          >
+            <img alt="example" style={{ width: "100%" }} src={previewImage} />
+          </Modal>
         </FormItem>
         <FormItem {...submitFormLayout} style={{ marginTop: 32 }}>
           <Button type="primary" htmlType="submit" loading={submitting}>
