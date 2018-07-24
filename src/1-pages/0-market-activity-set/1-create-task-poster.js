@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { observer, inject } from "mobx-react";
 import axios from "axios";
+import { SketchPicker } from "react-color";
 import {
   Radio,
   Form,
@@ -11,7 +12,8 @@ import {
   Icon,
   Switch,
   InputNumber,
-  message
+  message,
+  Tooltip
 } from "antd";
 import { http } from "4-utils";
 import { Nav } from "0-components";
@@ -38,7 +40,9 @@ class Home extends Component {
     PosterOptions: ["二维码", "头像", "昵称"],
     imageLoading: false,
     ercodeLoading: false,
-    poster_id: null
+    poster_id: null,
+    isPicker: false,
+    code_font_color: "#333333"
   };
   // 当前选中 1.服务号 2.订阅号
   wxChange = e => {
@@ -192,9 +196,13 @@ class Home extends Component {
         }));
       case 5:
         this.setState(() => ({
-          code_font_color: value
+          code_font_color: value.hex
         }));
     }
+  };
+  handleChangeComplete = (color, event) => {
+    console.log(color);
+    console.log(event);
   };
   removeImg = () => {
     console.log(123);
@@ -215,13 +223,21 @@ class Home extends Component {
       message.error("缺少字体颜色", 2);
       return;
     } else if (!code_end) {
-      message.error("缺少字体颜色", 2);
+      message.error("缺少邀请码开始值", 2);
       return;
     } else if (!code_start) {
-      message.error("缺少字体颜色", 2);
+      message.error("缺少邀请码结束值", 2);
       return;
     }
     // ...
+  };
+  change = e => {
+    console.log(e);
+  };
+  colorPicker = () => {
+    this.setState(pre => ({
+      isPicker: !pre.isPicker
+    }));
   };
   render() {
     const { getFieldDecorator } = this.props.form;
@@ -233,7 +249,9 @@ class Home extends Component {
       imageUrl,
       ercodeUrl,
       poster_id,
-      submit
+      submit,
+      isPicker,
+      code_font_color
     } = this.state;
     const formItemLayout = {
       labelCol: { span: 4 },
@@ -243,6 +261,7 @@ class Home extends Component {
       labelCol: { span: 5 },
       wrapperCol: { span: 19 }
     };
+    console.log(code_font_color);
     return (
       <div>
         <Nav poster_id={poster_id} submit={submit} />
@@ -272,7 +291,9 @@ class Home extends Component {
             {/*3. 海报上传与预览 */}
             <div className="flex">
               <div className="ant-col-4 ant-form-item-label">
-                <label className="ant-form-item-required c333 text-right">海报设计</label>
+                <label className="ant-form-item-required c333 text-right">
+                  海报设计
+                </label>
               </div>
               {/*3.1 海报预览 */}
               <div className="flex equal">
@@ -389,12 +410,14 @@ class Home extends Component {
                       <div className="common-warning">
                         二维码尺寸：200X200px；
                       </div>
-                      <div className="common-warning">
+                      <div className="common-warning mb10">
                         大小200kb以内，支持png/jpg文件
                       </div>
                       <div className="flex">
                         <div className="ant-col-5 ant-form-item-label c333">
-                         <label className="ant-form-item-required">邀请码</label>
+                          <label className="ant-form-item-required">
+                            邀请码
+                          </label>
                         </div>
                         <div>
                           <div className="flex">
@@ -410,6 +433,7 @@ class Home extends Component {
                                 <InputNumber
                                   onChange={value => this.getValue(value, 2)}
                                   placeholder="开始值"
+                                  min={0}
                                 />
                               )}
                             </FormItem>
@@ -420,6 +444,7 @@ class Home extends Component {
                                 ]
                               })(
                                 <InputNumber
+                                  min={0}
                                   placeholder="结束值"
                                   onChange={value => this.getValue(value, 3)}
                                 />
@@ -436,24 +461,45 @@ class Home extends Component {
                                 <InputNumber
                                   onChange={value => this.getValue(value, 4)}
                                   placeholder="字体大小"
+                                  max={50}
+                                  min={0}
                                   style={{
                                     marginRight: "10px"
                                   }}
                                 />
                               )}
                             </FormItem>
-                            <FormItem {...formItemLayoutSamll}>
-                              {getFieldDecorator("code_font_color", {
-                                rules: [
-                                  { required: true, message: "请填写字体颜色" }
-                                ]
-                              })(
-                                <Input
-                                  onChange={value => this.getValue(value, 5)}
-                                  placeholder="字体颜色"
+                            <div
+                              className="relative"
+                              style={{ marginTop: "3px" }}
+                            >
+                              <Tooltip placement="topLeft" title="选择字体颜色">
+                                <div
+                                  onClick={this.colorPicker}
+                                  style={{
+                                    margin: "0px",
+                                    backgroundColor: `${code_font_color}`
+                                  }}
+                                  className="w32 h32 r4 common-curson"
                                 />
+                              </Tooltip>
+                              {isPicker && (
+                                <div className="absolute z20">
+                                  <div
+                                    className="common-cover"
+                                    onClick={this.colorPicker}
+                                  />
+                                  <SketchPicker
+                                    disableAlpha
+                                    color={code_font_color}
+                                    onChange={value => this.getValue(value, 5)}
+                                    handleChangeComplete={
+                                      this.handleChangeComplete
+                                    }
+                                  />
+                                </div>
                               )}
-                            </FormItem>
+                            </div>
                           </div>
                         </div>
                       </div>
