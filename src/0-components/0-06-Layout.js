@@ -147,9 +147,9 @@ class CommonLayout extends Component {
                 <Menu.Item key="01">创建任务海报</Menu.Item>
                 <Menu.Item key="02">基本信息设置</Menu.Item>
                 <Menu.Item key="03">成员加入提醒</Menu.Item>
-                <Menu.Item key="04">一介任务完成</Menu.Item>
-                <Menu.Item key="05">二介任务完成</Menu.Item>
-                <Menu.Item key="06">三介任务完成</Menu.Item>
+                <Menu.Item key="04">一阶任务完成</Menu.Item>
+                <Menu.Item key="05">二阶任务完成</Menu.Item>
+                <Menu.Item key="06">三阶任务完成</Menu.Item>
                 <Menu.Item key="07">客服消息回复</Menu.Item>
               </SubMenu> */}
               <SubMenu
