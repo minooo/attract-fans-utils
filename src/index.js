@@ -12,7 +12,7 @@ import "./2-static/styles/common/common.css";
 
 const app = (
   <Provider {...stores}>
-    <App />
+      <App />
   </Provider>
 );
 

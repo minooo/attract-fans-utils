@@ -6,6 +6,7 @@
     "antd": "^3.6.6",
     "axios": "^0.18.0",
     "babel-plugin-import": "^1.8.0",
+    "bizcharts": "^3.2.0",
     "less": "2.7.3",
     "less-loader": "^4.1.0",
     "mobx": "^5.0.3",
@@ -22,7 +23,7 @@
     "react-router-dom": "^4.3.1",
     "react-scripts": "1.1.4"
   },
-  "proxy": "http://mp.dev.duduapp.net",
+  "proxy": "http://mp.dev.duduapp.net/h5backend",
   "scripts": {
     "build-css": "node-sass-chokidar ./src/2-static/styles/common/common.scss -o ./src/2-static/styles/common",
     "watch-css": "npm run build-css && node-sass-chokidar ./src/2-static/styles/common/common.scss -o ./src/2-static/styles/common --watch --recursive",

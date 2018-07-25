@@ -184,7 +184,6 @@ class CommonLayout extends Component {
                 type={menuCollapsed.isCollapsed ? "menu-unfold" : "menu-fold"}
                 onClick={this.onToggle}
               />
-              <div>shadow</div>
             </Header>
             <div className="admin-common-content plr25 ptb20 bg-white">
               {children}
