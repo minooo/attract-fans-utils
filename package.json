@@ -23,7 +23,7 @@
     "react-router-dom": "^4.3.1",
     "react-scripts": "1.1.4"
   },
-  "proxy": "http://mp.dev.duduapp.net",
+  "proxy": "http://mp.dev.duduapp.net/h5backend",
   "scripts": {
     "build-css": "node-sass-chokidar ./src/2-static/styles/common/common.scss -o ./src/2-static/styles/common",
     "watch-css": "npm run build-css && node-sass-chokidar ./src/2-static/styles/common/common.scss -o ./src/2-static/styles/common --watch --recursive",

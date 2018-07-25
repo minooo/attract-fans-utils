@@ -15,25 +15,12 @@ import {
   message,
   Tooltip
 } from "antd";
-import { http } from "4-utils";
 import { Nav } from "0-components";
 
 const RadioGroup = Radio.Group;
 const FormItem = Form.Item;
-const RadioButton = Radio.Button;
 const { TextArea } = Input;
 const CheckboxGroup = Checkbox.Group;
-const getBase64 = (img, callback) => {
-  const reader = new FileReader();
-  reader.addEventListener("load", () => callback(reader.result));
-  reader.readAsDataURL(img);
-};
-const selectCon = arr => {
-  return {
-    is_code: arr.includes("二维码"),
-    is_avatar: arr.includes("头像")
-  };
-};
 class Home extends Component {
   state = {
     wxType: 1,
@@ -58,74 +45,6 @@ class Home extends Component {
         PosterOptions: ["头像", "昵称"]
       }));
     }
-  };
-  // 上传状态改变
-  handleChange = (info, type) => {
-    // type 1.海报 2.二维码
-    if (info.file.status === "uploading") {
-      if (type === 1) {
-        this.setState({ imageLoading: true });
-      } else {
-        this.setState({ ercodeLoading: true });
-      }
-      return;
-    }
-    console.log(info.file.originFileObj);
-    if (info.file.status === "done") {
-      getBase64(info.file.originFileObj, imageUrl => {
-        if (type === 1) {
-          this.setState({
-            imageUrl,
-            imageLoading: false
-          });
-        } else {
-          this.setState({
-            ercodeUrl: imageUrl,
-            ercodeLoading: false
-          });
-        }
-      });
-    }
-  };
-  // 验证图片
-  beforeUpload = (file, fileList, width, height) => {
-    const isImage = file.type === "image/jpeg" || "image/png";
-    if (!isImage) {
-      message.error("请上传png/jpg类型的图片", 2);
-    }
-    const isLt200k = file.size / 1024 < 200;
-    if (!isLt200k) {
-      message.error("图片要小于200k");
-    }
-    const reader = new FileReader();
-    //读取图片数据
-    reader.addEventListener("load", e => {
-      const data = e.target.result;
-      //加载图片获取图片真实宽度和高度
-      const image = new Image();
-      image.addEventListener("load", () => {
-        const w = image.width;
-        const h = image.height;
-        if (w !== width && h !== height) {
-          message.error("请上传符合尺寸的图片", 2, () => {
-            console.info(111);
-            this.setState(
-              pre => ({
-                isSize: !pre.isSize
-              }),
-              () => {
-                console.info(1);
-              }
-            );
-          });
-        }
-      });
-      image.src = data;
-    });
-    reader.readAsDataURL(file);
-    // console.log(this.state.isSize);
-    // console.log(isImage && isLt200k && this.state.isSize);
-    return isImage && isLt200k && this.state.isSize;
   };
   handleSubmit = e => {
     this.setState(() => ({
@@ -177,32 +96,35 @@ class Home extends Component {
   };
   // 预览图片需要数据
   getValue = (value, type) => {
+    console.log(value)
     switch (type) {
       case 1:
         this.setState(() => ({
           posterCon: value
         }));
+        break
       case 2:
         this.setState(() => ({
           code_start: value
         }));
+        break
       case 3:
         this.setState(() => ({
           code_end: value
         }));
+        break
       case 4:
         this.setState(() => ({
           code_font_size: value
         }));
+        break
       case 5:
         this.setState(() => ({
           code_font_color: value.hex
         }));
+        break
+        default: return
     }
-  };
-  handleChangeComplete = (color, event) => {
-    console.log(color);
-    console.log(event);
   };
   removeImg = () => {
     console.log(123);
@@ -213,7 +135,7 @@ class Home extends Component {
       code_font_color,
       code_font_size,
       code_end,
-      posterCon,
+      // posterCon,
       code_start
     } = this.state;
     if (!code_font_size) {
@@ -230,9 +152,6 @@ class Home extends Component {
       return;
     }
     // ...
-  };
-  change = e => {
-    console.log(e);
   };
   colorPicker = () => {
     this.setState(pre => ({
@@ -261,7 +180,6 @@ class Home extends Component {
       labelCol: { span: 5 },
       wrapperCol: { span: 19 }
     };
-    console.log(code_font_color);
     return (
       <div>
         <Nav poster_id={poster_id} submit={submit} />
@@ -425,12 +343,9 @@ class Home extends Component {
                               style={{ marginRight: "10px" }}
                               {...formItemLayoutSamll}
                             >
-                              {getFieldDecorator("code_start", {
-                                rules: [
-                                  { required: true, message: "请填写开始值" }
-                                ]
-                              })(
+                              {getFieldDecorator("code_start",)(
                                 <InputNumber
+                                  disabled
                                   onChange={value => this.getValue(value, 2)}
                                   placeholder="开始值"
                                   min={0}
@@ -438,13 +353,10 @@ class Home extends Component {
                               )}
                             </FormItem>
                             <FormItem {...formItemLayoutSamll}>
-                              {getFieldDecorator("code_end", {
-                                rules: [
-                                  { required: true, message: "请填写结束值" }
-                                ]
-                              })(
+                              {getFieldDecorator("code_end",)(
                                 <InputNumber
                                   min={0}
+                                  disabled
                                   placeholder="结束值"
                                   onChange={value => this.getValue(value, 3)}
                                 />
