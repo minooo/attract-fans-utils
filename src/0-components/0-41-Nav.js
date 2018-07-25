@@ -110,7 +110,7 @@ class CommonLayout extends Component {
           mode="horizontal"
           defaultSelectedKeys={["0"]}
           selectedKeys={Current}
-          style={{display:"flex",justifyContent:"center"}}
+          style={{ display: "flex", justifyContent: "center" }}
         >
           {config.map(item => (
             <Menu.Item key={item.key}>{item.text}</Menu.Item>

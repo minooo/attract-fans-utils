@@ -37,7 +37,7 @@ class Home extends Component {
       show:true
     }))
     http
-      .get("/L15aP8O79DN1QVyKRbpd", {
+      .get("", {
         action: "poster",
         operation: "index",
         page,
