@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { Breadcrumb, Select, Row, Col, DatePicker, Radio } from "antd";
-import { Chart, Geom, Axis, Tooltip, Legend, Coord } from "bizcharts";
+import { Chart, Geom, Axis, Tooltip } from "bizcharts";
 
 const Option = Select.Option;
 const { RangePicker } = DatePicker;
