@@ -172,8 +172,8 @@ class CommonLayout extends Component {
             </Menu>
           </Sider>
           <Layout
-            style={{ marginLeft: menuCollapsed.isCollapsed ? 80 : 220 }}
-            className="transition-margin"
+            style={{ marginLeft: menuCollapsed.isCollapsed ? 80 : 220, minHeight: "100vh" }}
+            className="transition-margin flex jc-between"
           >
             <Header
               style={{ padding: "0 24px 0 0", backgroundColor: "#fff" }}
@@ -185,7 +185,7 @@ class CommonLayout extends Component {
                 onClick={this.onToggle}
               />
             </Header>
-            <div className="admin-common-content plr25 ptb20 bg-white">
+            <div className="admin-common-content plr25 ptb20 bg-white equal">
               {children}
             </div>
             <Footer style={{ textAlign: "center" }}>

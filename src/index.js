@@ -1,6 +1,8 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import { Provider } from "mobx-react";
+import { LocaleProvider } from "antd";
+import zhCN from "antd/lib/locale-provider/zh_CN";
 import registerServiceWorker from "./registerServiceWorker";
 
 // 统一引进store
@@ -11,9 +13,11 @@ import App from "./5-root";
 import "./2-static/styles/common/common.css";
 
 const app = (
-  <Provider {...stores}>
+  <LocaleProvider locale={zhCN}>
+    <Provider {...stores}>
       <App />
-  </Provider>
+    </Provider>
+  </LocaleProvider>
 );
 
 ReactDOM.render(app, document.getElementById("root"));

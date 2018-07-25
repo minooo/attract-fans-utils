@@ -642,6 +642,26 @@ button {
 .textleft .ant-form-item-label {
   text-align: left; }
 
+.basic-tack .ant-form-item-children {
+  display: flex; }
+
+.basic-tack .ant-input-group-addon, .ant-input-group-wrap {
+  width: auto;
+  line-height: 30px;
+  box-sizing: border-box; }
+
+.basic-tack .ant-input-number-input {
+  border-radius: 0;
+  border: none; }
+
+.basic-tack .ant-input-number {
+  border-radius: 0; }
+
+.basic-tack .has-error .ant-input-group-addon {
+  color: rgba(0, 0, 0, 0.65);
+  border-color: #d9d9d9;
+  background-color: #fafafa; }
+
 .common-full {
   top: 0;
   right: 0;
@@ -659,6 +679,13 @@ button {
   z-index: 100;
   background-color: rgba(0, 0, 0, 0.4);
   transition: all 0.3s;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0; }
+
+.common-cover {
+  position: fixed;
   top: 0;
   left: 0;
   bottom: 0;

@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { observer, inject } from "mobx-react";
 import axios from "axios";
+import { SketchPicker } from "react-color";
 import {
   Radio,
   Form,
@@ -11,34 +12,24 @@ import {
   Icon,
   Switch,
   InputNumber,
-  message
+  message,
+  Tooltip
 } from "antd";
-import { http } from "4-utils";
 import { Nav } from "0-components";
 
 const RadioGroup = Radio.Group;
 const FormItem = Form.Item;
-const RadioButton = Radio.Button;
 const { TextArea } = Input;
 const CheckboxGroup = Checkbox.Group;
-const getBase64 = (img, callback) => {
-  const reader = new FileReader();
-  reader.addEventListener("load", () => callback(reader.result));
-  reader.readAsDataURL(img);
-};
-const selectCon = arr => {
-  return {
-    is_code: arr.includes("二维码"),
-    is_avatar: arr.includes("头像")
-  };
-};
 class Home extends Component {
   state = {
     wxType: 1,
     PosterOptions: ["二维码", "头像", "昵称"],
     imageLoading: false,
     ercodeLoading: false,
-    poster_id: null
+    poster_id: null,
+    isPicker: false,
+    code_font_color: "#333333"
   };
   // 当前选中 1.服务号 2.订阅号
   wxChange = e => {
@@ -54,74 +45,6 @@ class Home extends Component {
         PosterOptions: ["头像", "昵称"]
       }));
     }
-  };
-  // 上传状态改变
-  handleChange = (info, type) => {
-    // type 1.海报 2.二维码
-    if (info.file.status === "uploading") {
-      if (type === 1) {
-        this.setState({ imageLoading: true });
-      } else {
-        this.setState({ ercodeLoading: true });
-      }
-      return;
-    }
-    console.log(info.file.originFileObj);
-    if (info.file.status === "done") {
-      getBase64(info.file.originFileObj, imageUrl => {
-        if (type === 1) {
-          this.setState({
-            imageUrl,
-            imageLoading: false
-          });
-        } else {
-          this.setState({
-            ercodeUrl: imageUrl,
-            ercodeLoading: false
-          });
-        }
-      });
-    }
-  };
-  // 验证图片
-  beforeUpload = (file, fileList, width, height) => {
-    const isImage = file.type === "image/jpeg" || "image/png";
-    if (!isImage) {
-      message.error("请上传png/jpg类型的图片", 2);
-    }
-    const isLt200k = file.size / 1024 < 200;
-    if (!isLt200k) {
-      message.error("图片要小于200k");
-    }
-    const reader = new FileReader();
-    //读取图片数据
-    reader.addEventListener("load", e => {
-      const data = e.target.result;
-      //加载图片获取图片真实宽度和高度
-      const image = new Image();
-      image.addEventListener("load", () => {
-        const w = image.width;
-        const h = image.height;
-        if (w !== width && h !== height) {
-          message.error("请上传符合尺寸的图片", 2, () => {
-            console.info(111);
-            this.setState(
-              pre => ({
-                isSize: !pre.isSize
-              }),
-              () => {
-                console.info(1);
-              }
-            );
-          });
-        }
-      });
-      image.src = data;
-    });
-    reader.readAsDataURL(file);
-    // console.log(this.state.isSize);
-    // console.log(isImage && isLt200k && this.state.isSize);
-    return isImage && isLt200k && this.state.isSize;
   };
   handleSubmit = e => {
     this.setState(() => ({
@@ -173,27 +96,34 @@ class Home extends Component {
   };
   // 预览图片需要数据
   getValue = (value, type) => {
+    console.log(value)
     switch (type) {
       case 1:
         this.setState(() => ({
           posterCon: value
         }));
+        break
       case 2:
         this.setState(() => ({
           code_start: value
         }));
+        break
       case 3:
         this.setState(() => ({
           code_end: value
         }));
+        break
       case 4:
         this.setState(() => ({
           code_font_size: value
         }));
+        break
       case 5:
         this.setState(() => ({
-          code_font_color: value
+          code_font_color: value.hex
         }));
+        break
+        default: return
     }
   };
   removeImg = () => {
@@ -205,7 +135,7 @@ class Home extends Component {
       code_font_color,
       code_font_size,
       code_end,
-      posterCon,
+      // posterCon,
       code_start
     } = this.state;
     if (!code_font_size) {
@@ -215,13 +145,18 @@ class Home extends Component {
       message.error("缺少字体颜色", 2);
       return;
     } else if (!code_end) {
-      message.error("缺少字体颜色", 2);
+      message.error("缺少邀请码开始值", 2);
       return;
     } else if (!code_start) {
-      message.error("缺少字体颜色", 2);
+      message.error("缺少邀请码结束值", 2);
       return;
     }
     // ...
+  };
+  colorPicker = () => {
+    this.setState(pre => ({
+      isPicker: !pre.isPicker
+    }));
   };
   render() {
     const { getFieldDecorator } = this.props.form;
@@ -233,7 +168,9 @@ class Home extends Component {
       imageUrl,
       ercodeUrl,
       poster_id,
-      submit
+      submit,
+      isPicker,
+      code_font_color
     } = this.state;
     const formItemLayout = {
       labelCol: { span: 4 },
@@ -272,7 +209,9 @@ class Home extends Component {
             {/*3. 海报上传与预览 */}
             <div className="flex">
               <div className="ant-col-4 ant-form-item-label">
-                <label className="ant-form-item-required c333 text-right">海报设计</label>
+                <label className="ant-form-item-required c333 text-right">
+                  海报设计
+                </label>
               </div>
               {/*3.1 海报预览 */}
               <div className="flex equal">
@@ -389,12 +328,14 @@ class Home extends Component {
                       <div className="common-warning">
                         二维码尺寸：200X200px；
                       </div>
-                      <div className="common-warning">
+                      <div className="common-warning mb10">
                         大小200kb以内，支持png/jpg文件
                       </div>
                       <div className="flex">
                         <div className="ant-col-5 ant-form-item-label c333">
-                         <label className="ant-form-item-required">邀请码</label>
+                          <label className="ant-form-item-required">
+                            邀请码
+                          </label>
                         </div>
                         <div>
                           <div className="flex">
@@ -402,24 +343,20 @@ class Home extends Component {
                               style={{ marginRight: "10px" }}
                               {...formItemLayoutSamll}
                             >
-                              {getFieldDecorator("code_start", {
-                                rules: [
-                                  { required: true, message: "请填写开始值" }
-                                ]
-                              })(
+                              {getFieldDecorator("code_start",)(
                                 <InputNumber
+                                  disabled
                                   onChange={value => this.getValue(value, 2)}
                                   placeholder="开始值"
+                                  min={0}
                                 />
                               )}
                             </FormItem>
                             <FormItem {...formItemLayoutSamll}>
-                              {getFieldDecorator("code_end", {
-                                rules: [
-                                  { required: true, message: "请填写结束值" }
-                                ]
-                              })(
+                              {getFieldDecorator("code_end",)(
                                 <InputNumber
+                                  min={0}
+                                  disabled
                                   placeholder="结束值"
                                   onChange={value => this.getValue(value, 3)}
                                 />
@@ -436,24 +373,45 @@ class Home extends Component {
                                 <InputNumber
                                   onChange={value => this.getValue(value, 4)}
                                   placeholder="字体大小"
+                                  max={50}
+                                  min={0}
                                   style={{
                                     marginRight: "10px"
                                   }}
                                 />
                               )}
                             </FormItem>
-                            <FormItem {...formItemLayoutSamll}>
-                              {getFieldDecorator("code_font_color", {
-                                rules: [
-                                  { required: true, message: "请填写字体颜色" }
-                                ]
-                              })(
-                                <Input
-                                  onChange={value => this.getValue(value, 5)}
-                                  placeholder="字体颜色"
+                            <div
+                              className="relative"
+                              style={{ marginTop: "3px" }}
+                            >
+                              <Tooltip placement="topLeft" title="选择字体颜色">
+                                <div
+                                  onClick={this.colorPicker}
+                                  style={{
+                                    margin: "0px",
+                                    backgroundColor: `${code_font_color}`
+                                  }}
+                                  className="w32 h32 r4 common-curson"
                                 />
+                              </Tooltip>
+                              {isPicker && (
+                                <div className="absolute z20">
+                                  <div
+                                    className="common-cover"
+                                    onClick={this.colorPicker}
+                                  />
+                                  <SketchPicker
+                                    disableAlpha
+                                    color={code_font_color}
+                                    onChange={value => this.getValue(value, 5)}
+                                    handleChangeComplete={
+                                      this.handleChangeComplete
+                                    }
+                                  />
+                                </div>
                               )}
-                            </FormItem>
+                            </div>
                           </div>
                         </div>
                       </div>
