@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { Breadcrumb, Row, Col, DatePicker, Radio, message, Table } from "antd";
-import { Chart, Geom, Axis, Tooltip, Legend, Coord } from "bizcharts";
+import { Chart, Geom, Axis, Tooltip } from "bizcharts";
 import { http } from "4-utils";
 
 const { RangePicker } = DatePicker;
@@ -23,7 +23,7 @@ export default class extends Component {
       chart_time: "2018-07-12 - 2018-07-15",
       list_time: "2018-07-12 - 2018-07-17"
     });
-    if (errcode == 0 && msg === "success") {
+    if (parseInt(errcode, 10) === 0 && msg === "success") {
       this.setState({
         stat_data: result.stat_data,
         chart_data: result.chart_data,

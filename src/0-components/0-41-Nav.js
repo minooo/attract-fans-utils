@@ -75,7 +75,7 @@ class CommonLayout extends Component {
     const { finish, history, poster_id, location } = this.props;
     const { id } = this.props.match.params;
     const { key } = this.state;
-    if (finish && parseInt(key) === 0) {
+    if (finish && parseInt(key, 10) === 0) {
       this.setState({
         visible: false
       });
@@ -85,7 +85,7 @@ class CommonLayout extends Component {
         visible: false
       });
       const paramId = id || poster_id;
-      const path=config[parseInt(key)].path
+      const path = config[parseInt(key, 10)].path;
       location.pathname.includes("/create-task-poster")
         ? history.replace(`${path}_${paramId}`)
         : history.push(`${path}_${paramId}`);
@@ -116,7 +116,7 @@ class CommonLayout extends Component {
           mode="horizontal"
           defaultSelectedKeys={["0"]}
           selectedKeys={Current}
-          style={{display:"flex",justifyContent:"center"}}
+          style={{ display: "flex", justifyContent: "center" }}
         >
           {config.map(item => (
             <Menu.Item key={item.key}>{item.text}</Menu.Item>
