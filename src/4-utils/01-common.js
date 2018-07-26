@@ -1,3 +1,5 @@
+import moment from "moment";
+
 export const serializeParams = params =>
   Object.entries(params)
     .map(n => `${n[0]}=${n[1]}`)
@@ -256,7 +258,7 @@ export const countDown = (upDateParse, timer) => {
   const dateDifference = upDateParse - new Date();
   // 时间到
   if (dateDifference <= 0) {
-    if (timer) clearInterval(timer)
+    if (timer) clearInterval(timer);
     return false;
   }
   /* eslint-disable */
@@ -288,4 +290,18 @@ export const countDown = (upDateParse, timer) => {
     getMinutes,
     getSeconds
   };
+};
+
+export const getTimeDistance = type => {
+  if (type === "today") {
+    return [moment(), moment()];
+  }
+
+  if (type === "week") {
+    return [moment().add(-1, "week"), moment()];
+  }
+
+  if (type === "month") {
+    return [moment().add(-1, "months"), moment()];
+  }
 };

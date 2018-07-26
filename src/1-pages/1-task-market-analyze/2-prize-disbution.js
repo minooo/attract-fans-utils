@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import 'moment/locale/zh-cn';
 
 export default class extends Component {
   state = {};

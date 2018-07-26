@@ -1,7 +1,9 @@
 import React, { Component } from "react";
 import { Breadcrumb, Row, Col, DatePicker, Radio, message, Table } from "antd";
 import { Chart, Geom, Axis, Tooltip } from "bizcharts";
-import { http } from "4-utils";
+import { http, common } from "4-utils";
+import moment from "moment";
+import "moment/locale/zh-cn";
 
 const { RangePicker } = DatePicker;
 
@@ -11,17 +13,27 @@ const cols = {
 };
 
 export default class extends Component {
-  state = { salesType: "follow _num", rangePickerValue: "" };
+  state = {
+    salesType: "follow_num",
+    rangePickerValue: common.getTimeDistance("week"),
+    rangePickerValue1: common.getTimeDistance("week"),
+    chart_time: `${moment()
+      .add(-1, "week")
+      .format("YYYY-MM-DD")} - ${moment().format("YYYY-MM-DD")}`,
+    list_time: `${moment()
+      .add(-1, "week")
+      .format("YYYY-MM-DD")} - ${moment().format("YYYY-MM-DD")}`
+  };
   componentDidMount() {
     this.getData();
   }
   getData = async () => {
+    const { chart_time, list_time } = this.state;
     const { errcode, msg, result } = await http.get(null, {
       action: "statics",
       operation: "userAnalysis",
-      proster_id: 1,
-      chart_time: "2018-07-12 - 2018-07-15",
-      list_time: "2018-07-12 - 2018-07-17"
+      chart_time,
+      list_time
     });
     if (parseInt(errcode, 10) === 0 && msg === "success") {
       this.setState({
@@ -41,24 +53,73 @@ export default class extends Component {
   };
   // 日期选择器
   handleRangePickerChange = rangePickerValue => {
-    this.setState({
-      rangePickerValue
-    });
+    this.setState(
+      () => ({
+        rangePickerValue,
+        chart_time: `${moment(rangePickerValue[0]).format(
+          "YYYY-MM-DD"
+        )} - ${moment(rangePickerValue[1]).format("YYYY-MM-DD")}`
+      }),
+      () => {
+        this.getData();
+      }
+    );
+  };
+  handleRangePickerChange1 = rangePickerValue1 => {
+    this.setState(
+      () => ({
+        rangePickerValue1,
+        list_time: `${moment(rangePickerValue1[0]).format(
+          "YYYY-MM-DD"
+        )} - ${moment(rangePickerValue1[1]).format("YYYY-MM-DD")}`
+      }),
+      () => {
+        this.getData();
+      }
+    );
+  };
+  selectDate = type => {
+    this.setState(
+      () => ({
+        rangePickerValue: common.getTimeDistance(type),
+        chart_time: `${moment(common.getTimeDistance(type)[0]).format(
+          "YYYY-MM-DD"
+        )} - ${moment(common.getTimeDistance(type)[1]).format("YYYY-MM-DD")}`
+      }),
+      () => {
+        this.getData();
+      }
+    );
+  };
+
+  isActive = type => {
+    const { rangePickerValue } = this.state;
+    const value = common.getTimeDistance(type);
+    if (!rangePickerValue[0] || !rangePickerValue[1]) {
+      return;
+    }
+    if (
+      rangePickerValue[0].isSame(value[0], "day") &&
+      rangePickerValue[1].isSame(value[1], "day")
+    ) {
+      return "currentDate";
+    }
   };
   render() {
     const {
       salesType,
       rangePickerValue,
+      rangePickerValue1,
       stat_data,
       chart_data,
       list_data
     } = this.state;
     const logColumns = [
       { title: "时间", dataIndex: "date" },
-      { title: "新增关注人数", dataIndex: "follow_num" },
-      { title: "取消关注人数", dataIndex: "cancel_num" },
-      { title: "净增关注人数", dataIndex: "growth_num" },
-      { title: "累积关注人数", dataIndex: "cumulate_num" }
+      { title: "新增关注人数", dataIndex: "follow_num",key:"follow_num" },
+      { title: "取消关注人数", dataIndex: "cancel_num",key:"cancel_num" },
+      { title: "净增关注人数", dataIndex: "growth_num",key:"growth_num" },
+      { title: "累积关注人数", dataIndex: "cumulate_num",key:"cumulate_num" }
     ];
     return (
       <div>
@@ -106,20 +167,39 @@ export default class extends Component {
                 value={salesType}
                 onChange={this.handleChangeSalesType}
               >
-                <Radio.Button value="follow _num">新增关注人数</Radio.Button>
-                <Radio.Button value="cancel _num">取消关注人数</Radio.Button>
-                <Radio.Button value="growth _num">净增关注人数</Radio.Button>
-                <Radio.Button value="cumulate _num">累积关注人数</Radio.Button>
+                <Radio.Button value="follow_num">新增关注人数</Radio.Button>
+                <Radio.Button value="cancel_num">取消关注人数</Radio.Button>
+                <Radio.Button value="growth_num">净增关注人数</Radio.Button>
+                <Radio.Button value="cumulate_num">累积关注人数</Radio.Button>
               </Radio.Group>
             </div>
             <div className=" flex ai-center">
-              <div>
-                <a>今日</a>
-                <a>本周</a>
-                <a>本月</a>
+              <div className="salesExtra">
+                <a
+                  className={this.isActive("today")}
+                  onClick={() => this.selectDate("today")}
+                >
+                  今日
+                </a>
+                <a
+                  className={this.isActive("week")}
+                  onClick={() => this.selectDate("week")}
+                >
+                  本周
+                </a>
+                <a
+                  className={this.isActive("month")}
+                  onClick={() => this.selectDate("month")}
+                >
+                  本月
+                </a>
               </div>
               <RangePicker
                 value={rangePickerValue}
+                disabledDate={current =>
+                  current - new Date(new Date().setHours(0, 0, 0, 0)) >
+                  24 * 3600 * 1000
+                }
                 onChange={this.handleRangePickerChange}
                 style={{ width: 256 }}
               />
@@ -127,30 +207,33 @@ export default class extends Component {
           </div>
           <Row>
             <Col span={24}>
-              {chart_data &&
-                chart_data.follow_num && (
-                  <Chart
-                    height={400}
-                    data={chart_data.follow_num}
-                    scale={cols}
-                    forceFit
-                  >
-                    {/* 坐标轴 */}
-                    <Axis name="date" />
-                    <Axis name="value" />
-                    {/* 提示信息 */}
-                    <Tooltip crosshairs={{ type: "y" }} />
-                    {/* 几何标记 */}
-                    <Geom type="line" position="date*value" size={2} />
-                    <Geom
-                      type="point"
-                      position="date*value"
-                      size={4}
-                      shape={"circle"}
-                      style={{ stroke: "#fff", lineWidth: 1 }}
-                    />
-                  </Chart>
-                )}
+              {chart_data && (
+                <Chart
+                  height={400}
+                  data={chart_data[salesType]}
+                  scale={cols}
+                  padding="auto"
+                  forceFit
+                >
+                  {/* 坐标轴 */}
+                  <Axis name="date" />
+                  <Axis name="value" />
+                  {/* 提示信息 */}
+                  <Tooltip
+                    crosshairs={{ type: "y" }}
+                    itemTpl="<tr class=&quot;g2-tooltip-list-item&quot;><td style=&quot;color:{color}&quot;>人数：</td><td>{value}</td></tr>"
+                  />
+                  {/* 几何标记 */}
+                  <Geom type="line" position="date*value" size={2} />
+                  <Geom
+                    type="point"
+                    position="date*value"
+                    size={4}
+                    shape={"circle"}
+                    style={{ stroke: "#fff", lineWidth: 1 }}
+                  />
+                </Chart>
+              )}
             </Col>
           </Row>
         </div>
@@ -158,8 +241,12 @@ export default class extends Component {
         <div className=" mt30 mb30">
           <span className=" font16 ml25 mr20">选择时间:</span>
           <RangePicker
-            value={rangePickerValue}
-            onChange={this.handleRangePickerChange}
+            value={rangePickerValue1}
+            disabledDate={current =>
+              current - new Date(new Date().setHours(0, 0, 0, 0)) >
+              24 * 3600 * 1000
+            }
+            onChange={this.handleRangePickerChange1}
             style={{ width: 256 }}
           />
         </div>
