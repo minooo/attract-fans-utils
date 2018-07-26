@@ -16,9 +16,15 @@ class Home extends Component {
     this.getDate();
   }
   changeStu = data => {
-    console.info(data);
+    const { page } = this.state;
+    const { title, id } = data;
+    http.postC("", { action: "poster", operation: "turn", title, id }, () => {
+      this.getDate(page);
+    });
   };
   deleteAct = data => {
+    const { page } = this.state;
+    const { title, id } = data;
     confirm({
       title: "确定删除",
       content: "你真的要删除此次活动",
@@ -26,16 +32,26 @@ class Home extends Component {
       okType: "danger",
       cancelText: "取消",
       onOk() {
-        console.log("OK");
+        http.deleteC(
+          {
+            action: "poster",
+            operation: "delete",
+            title,
+            id
+          },
+          () => {
+            this.getDate(page);
+          }
+        );
       }
     });
   };
   // action=poster&operation=index
   // 获取数据
   getDate = (page, title) => {
-    this.setState(()=>({
-      show:true
-    }))
+    this.setState(() => ({
+      show: true
+    }));
     http
       .get("", {
         action: "poster",
@@ -45,7 +61,7 @@ class Home extends Component {
       })
       .then(res => {
         if (res.errcode === 0) {
-          const { data, total, per_page } = res;
+          const { data, total, per_page } = res.result;
           this.setState(() => ({
             data,
             total,
@@ -77,19 +93,38 @@ class Home extends Component {
     const { history } = this.props;
     history.push("/create-task-poster");
   };
+  onSearch = value => {
+    if (!value) {
+      this.setState(
+        () => ({
+          title: undefined,
+          page: undefined
+        }),
+        () => this.getDate()
+      );
+    } else {
+      this.setState(
+        () => ({
+          title: value,
+          page: 1
+        }),
+        () => this.getDate(1, value)
+      );
+    }
+  };
   render() {
     const { show, data, total, per_page, page } = this.state;
     const columns = [
       {
         title: "任务名称",
-        dataIndex: "name",
-        key: "name",
+        dataIndex: "title",
+        key: "title",
         align: "center"
       },
       {
         title: "开始时间",
-        dataIndex: "start_time",
-        key: "start_time",
+        dataIndex: "begin_time",
+        key: "begin_time",
         align: "center"
       },
       {
@@ -100,11 +135,11 @@ class Home extends Component {
       },
       {
         title: "状态设置",
-        key: "status",
+        key: "state",
         align: "center",
         render: data => (
           <WrapLink className="c-main" onClick={() => this.changeStu(data)}>
-            {data.status ? "开启" : "关闭"}
+            {data.state === 1 ? "开启" : "关闭"}
           </WrapLink>
         )
       },
@@ -190,7 +225,7 @@ class Home extends Component {
             enterButton="搜索"
             size="large"
             style={{ width: "300px" }}
-            onSearch={value => console.log(value)}
+            onSearch={this.onSearch}
           />
           <div className="font16 pl20">
             当前共有<span className="c-main">123</span>个营销活动

@@ -8,7 +8,7 @@ import {
   Cascader,
   Tag
 } from "antd";
-import locale from 'antd/lib/date-picker/locale/zh_CN';
+import 'moment/locale/zh-cn'
 import { city } from "../../2-static/city";
 import { Nav } from "0-components";
 
@@ -77,7 +77,7 @@ class BaseInfoSet extends Component {
             <FormItem {...formItemLayout} label="活动开始时间">
               {getFieldDecorator("begin_time", {
                 rules: [{ required: true, message: "请选择活动开始时间" }]
-              })(<DatePicker locale={locale} format="YYYY-MM-DD HH:mm:ss" placeholder="活动开始时间" showTime disabledDate={(current)=> current < new Date()} />)}
+              })(<DatePicker format="YYYY-MM-DD HH:mm:ss" placeholder="活动开始时间" showTime disabledDate={(current)=> current < new Date()} />)}
             </FormItem>
             <FormItem {...formItemLayout} label="活动结束时间">
               {getFieldDecorator("end_time", {
@@ -153,7 +153,7 @@ class BaseInfoSet extends Component {
                   ))}
               </div>
               <div className="font12 c666 mb10">
-                选择限制地区后，非该地区粉丝无法获取海报以及非该地区粉丝助力无效，选择地区点击添加，如需要删除点击对应地区即可
+                选择限制地区后，非该地区粉丝无法获取海报以及非该地区粉丝助力无效，选择地区点击添加，如需要删除点击对应地区即可订阅号无法获取。
               </div>
             </div>
             <FormItem {...formItemLayout} label="活动奖品库存">
@@ -166,7 +166,7 @@ class BaseInfoSet extends Component {
                 ]
               })(<InputNumber min={0} />)}
               <div className="c666 font12">
-                库存设置为0，则表示不限制库存； 库存减少到0时，系统自动终止活动
+                库存设置为0，则表示不限制库存； 库存减少到0时，系统自动终止活动。
               </div>
             </FormItem>
             <FormItem {...formItemLayout} label="取消扣除人气">
