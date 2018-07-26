@@ -843,6 +843,18 @@ button {
   cursor: not-allowed;
   opacity: 0.5; }
 
+.salesExtra {
+  display: inline-block;
+  margin-right: 24px; }
+  .salesExtra a {
+    color: rgba(0, 0, 0, 0.65);
+    margin-left: 24px;
+    font-size: 14px; }
+    .salesExtra a:hover {
+      color: #1890ff; }
+    .salesExtra a.currentDate {
+      color: #1890ff; }
+
 @keyframes rotate360 {
   from {
     transform: rotate(0deg); }
