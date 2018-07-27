@@ -66,9 +66,6 @@ class CommonLayout extends Component {
       case "12":
         history.push("/prize-disbution");
         break;
-      case "2":
-        history.push("/shielding-detection");
-        break;
       default:
         console.info("menu click");
     }
