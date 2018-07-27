@@ -834,7 +834,7 @@ button {
   top: 4px;
   font-size: 24px;
   color: #999;
-  transition: all .3s; }
+  transition: all 0.3s; }
 
 .dynamic-delete-button:hover {
   color: #777; }
@@ -846,13 +846,13 @@ button {
 .salesExtra {
   display: inline-block;
   margin-right: 24px; }
-  .salesExtra a {
+  .salesExtra button {
     color: rgba(0, 0, 0, 0.65);
     margin-left: 24px;
     font-size: 14px; }
-    .salesExtra a:hover {
+    .salesExtra button:hover {
       color: #1890ff; }
-    .salesExtra a.currentDate {
+    .salesExtra button.currentDate {
       color: #1890ff; }
 
 @keyframes rotate360 {

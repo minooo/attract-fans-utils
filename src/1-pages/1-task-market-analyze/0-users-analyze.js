@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { Breadcrumb, Row, Col, DatePicker, Radio, message, Table } from "antd";
 import { Chart, Geom, Axis, Tooltip } from "bizcharts";
 import { http, common } from "4-utils";
+import { LoadingFetch } from "0-components";
 import moment from "moment";
 import "moment/locale/zh-cn";
 
@@ -14,6 +15,7 @@ const cols = {
 
 export default class extends Component {
   state = {
+    show: false,
     salesType: "follow_num",
     rangePickerValue: common.getTimeDistance("week"),
     rangePickerValue1: common.getTimeDistance("week"),
@@ -28,6 +30,9 @@ export default class extends Component {
     this.getData();
   }
   getData = async () => {
+    this.setState(() => ({
+      show: true
+    }));
     const { chart_time, list_time } = this.state;
     const { errcode, msg, result } = await http.get(null, {
       action: "statics",
@@ -37,6 +42,7 @@ export default class extends Component {
     });
     if (parseInt(errcode, 10) === 0 && msg === "success") {
       this.setState({
+        show: false,
         stat_data: result.stat_data,
         chart_data: result.chart_data,
         list_data: result.list_data
@@ -107,6 +113,7 @@ export default class extends Component {
   };
   render() {
     const {
+      show,
       salesType,
       rangePickerValue,
       rangePickerValue1,
@@ -116,13 +123,14 @@ export default class extends Component {
     } = this.state;
     const logColumns = [
       { title: "时间", dataIndex: "date" },
-      { title: "新增关注人数", dataIndex: "follow_num",key:"follow_num" },
-      { title: "取消关注人数", dataIndex: "cancel_num",key:"cancel_num" },
-      { title: "净增关注人数", dataIndex: "growth_num",key:"growth_num" },
-      { title: "累积关注人数", dataIndex: "cumulate_num",key:"cumulate_num" }
+      { title: "新增关注人数", dataIndex: "follow_num", key: "follow_num" },
+      { title: "取消关注人数", dataIndex: "cancel_num", key: "cancel_num" },
+      { title: "净增关注人数", dataIndex: "growth_num", key: "growth_num" },
+      { title: "累积关注人数", dataIndex: "cumulate_num", key: "cumulate_num" }
     ];
     return (
-      <div>
+      <div style={{ minWidth: "996px" }}>
+        {show && <LoadingFetch />}
         <div className="admin-common-tip bg-white border-bottom-one">
           <Breadcrumb>
             <Breadcrumb.Item>管理中心</Breadcrumb.Item>
@@ -175,24 +183,24 @@ export default class extends Component {
             </div>
             <div className=" flex ai-center">
               <div className="salesExtra">
-                <a
+                <button
                   className={this.isActive("today")}
                   onClick={() => this.selectDate("today")}
                 >
                   今日
-                </a>
-                <a
+                </button>
+                <button
                   className={this.isActive("week")}
                   onClick={() => this.selectDate("week")}
                 >
                   本周
-                </a>
-                <a
+                </button>
+                <button
                   className={this.isActive("month")}
                   onClick={() => this.selectDate("month")}
                 >
                   本月
-                </a>
+                </button>
               </div>
               <RangePicker
                 value={rangePickerValue}
