@@ -1,13 +1,16 @@
-import React, { Component } from "react";
+import React, { Component,Fragment } from "react";
 import { Input, Form, Button, Icon } from "antd";
-// import { Loading } from "0-components";
+import { Nav } from "0-components";
 
 const FormItem = Form.Item;
 const { TextArea } = Input;
 let uuid = 1;
 
 class Member extends Component {
-  state = { submitting: false };
+  state = {
+    submitting: false,
+    submit: false
+  };
   componentDidMount() {}
   handleSubmit = e => {
     e.preventDefault();
@@ -66,7 +69,7 @@ class Member extends Component {
       }
     };
     const { getFieldDecorator, getFieldValue } = this.props.form;
-    const { submitting } = this.state;
+    const { submitting, submit } = this.state;
     getFieldDecorator("keys", { initialValue: [0] });
     const keys = getFieldValue("keys");
     console.info(keys);
@@ -76,10 +79,7 @@ class Member extends Component {
           {getFieldDecorator(`key[${k}]`, {
             validateTrigger: ["onChange", "onBlur"]
           })(
-            <Input
-              placeholder="key"
-              style={{ width: "40%", marginRight: 8 }}
-            />
+            <Input placeholder="key" style={{ width: "40%", marginRight: 8 }} />
           )}
           {getFieldDecorator(`valu[${k}]`, {
             validateTrigger: ["onChange", "onBlur"]
@@ -101,65 +101,68 @@ class Member extends Component {
       );
     });
     return (
-      <Form onSubmit={this.handleSubmit} style={{ marginTop: 8 }}>
-        <FormItem
-          {...formItemLayout}
-          label="ID"
-          extra="微信公众号后台-模板消息-成员加入提醒-模板ID"
-        >
-          {getFieldDecorator("templete_id", {
-            rules: [
-              {
-                required: true,
-                message: "请输入微信模板id！"
-              }
-            ]
-          })(<Input placeholder="请输入微信模板id" />)}
-        </FormItem>
-        <FormItem {...formItemLayout} label="头部">
-          {getFieldDecorator("first", {
-            rules: [
-              {
-                required: true,
-                message: "请输入模板头部信息！"
-              }
-            ]
-          })(
-            <TextArea
-              style={{ minHeight: 32 }}
-              placeholder="任务完成进度通知"
-              rows={4}
-            />
-          )}
-        </FormItem>
-        {formItems}
-        <FormItem {...submitFormLayout}>
-          <Button type="dashed" onClick={this.add} style={{ width: "30%" }}>
-            <Icon type="plus" /> 添加一条键
-          </Button>
-        </FormItem>
-        <FormItem {...formItemLayout} label="尾部">
-          {getFieldDecorator("first", {
-            rules: [
-              {
-                required: true,
-                message: "请输入模板尾部信息！"
-              }
-            ]
-          })(
-            <TextArea
-              style={{ minHeight: 32 }}
-              placeholder="模板尾部信息"
-              rows={4}
-            />
-          )}
-        </FormItem>
-        <FormItem {...submitFormLayout} style={{ marginTop: 32 }}>
-          <Button type="primary" htmlType="submit" loading={submitting}>
-            提交
-          </Button>
-        </FormItem>
-      </Form>
+      <Fragment>
+        <Nav  submit={submit} />
+        <Form onSubmit={this.handleSubmit} style={{ marginTop: 8 }}>
+          <FormItem
+            {...formItemLayout}
+            label="ID"
+            extra="微信公众号后台-模板消息-成员加入提醒-模板ID"
+          >
+            {getFieldDecorator("templete_id", {
+              rules: [
+                {
+                  required: true,
+                  message: "请输入微信模板id！"
+                }
+              ]
+            })(<Input placeholder="请输入微信模板id" />)}
+          </FormItem>
+          <FormItem {...formItemLayout} label="头部">
+            {getFieldDecorator("first", {
+              rules: [
+                {
+                  required: true,
+                  message: "请输入模板头部信息！"
+                }
+              ]
+            })(
+              <TextArea
+                style={{ minHeight: 32 }}
+                placeholder="任务完成进度通知"
+                rows={4}
+              />
+            )}
+          </FormItem>
+          {formItems}
+          <FormItem {...submitFormLayout}>
+            <Button type="dashed" onClick={this.add} style={{ width: "30%" }}>
+              <Icon type="plus" /> 添加一条键
+            </Button>
+          </FormItem>
+          <FormItem {...formItemLayout} label="尾部">
+            {getFieldDecorator("first", {
+              rules: [
+                {
+                  required: true,
+                  message: "请输入模板尾部信息！"
+                }
+              ]
+            })(
+              <TextArea
+                style={{ minHeight: 32 }}
+                placeholder="模板尾部信息"
+                rows={4}
+              />
+            )}
+          </FormItem>
+          <FormItem {...submitFormLayout} style={{ marginTop: 32 }}>
+            <Button type="primary" htmlType="submit" loading={submitting}>
+              提交
+            </Button>
+          </FormItem>
+        </Form>
+      </Fragment>
     );
   }
 }

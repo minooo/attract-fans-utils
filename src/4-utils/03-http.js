@@ -18,7 +18,7 @@ const callApi = (url, method, data, options = {}) => {
     Object.assign(
       {},
       {
-        baseURL: "/web/",
+        baseURL: "/L15aP8O79DN1QVyKRbpd",
         url,
         method,
         params: method === "get" ? data : {}, // 添加在请求URL后面的参数
@@ -32,11 +32,11 @@ const callApi = (url, method, data, options = {}) => {
 
 const commonCallApi = (url, method, data, options = {}) => successFn =>
   callApi(url, method, data, options).then(data => {
-    const { error } = data
-    if (!error) {
+    const { errcode } = data
+    if (!errcode) {
       successFn(data)
     } else {
-      message.error(data.message)
+      message.error(data.msg)
     }
   }).catch(err => {
     message.error("网络出错，请稍后再试！")

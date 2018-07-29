@@ -1,77 +1,38 @@
 import React, { Component } from "react";
 import {
   Form,
-  Input,
   Button,
-  Icon,
   Switch,
   InputNumber,
-  message,
   DatePicker,
   Cascader,
   Tag
 } from "antd";
+import 'moment/locale/zh-cn'
+import { city } from "../../2-static/city";
 import { Nav } from "0-components";
-import {city} from "../../2-static/city"
-// const options = [
-//   {
-//     value: "河南",
-//     label: "河南",
-//     id: 1,
-//     children: [
-//       {
-//         value: "州长",
-//         label: "州长",
-//         id: 3,
-//       }
-//     ]
-//   },
-//   {
-//     value: "罗马",
-//     id: 1,
-//     label: "罗马",
-//     children: [
-//       {
-//         value: "比利时",
-//         label: "比利时",
-//       }
-//     ]
-//   }
-// ];
-
-const fomtdata = (data) =>{
-  for(let i=0;i<data.length;i++){
-    data[i].label=data[i].value
-    for(let j=0;j<data[i].children.length;j++){
-      data[i].children[j].label=data[i].children[j].value
-    }
-  }
-  return data
-}
 const FormItem = Form.Item;
 
 class BaseInfoSet extends Component {
   state = {
     siteName: [],
-    province_id:[],
-    city_id:[]
+    area: [],
+    begin_time:null,
+    begin_time_d:null
   };
-  componentDidMount() {
-  }
+  componentDidMount() {}
   onChange = (arr, value) => {
-    // 0:{value: "河南", label: "河南", id: 1, children: Array(1)}
-    // 1:{value: "州长", label: "州长", id: 3}
-    // console.log(arr)
-    console.log(value)
-    const siteId=[value[0].id,value[1].id]
-    console.log(siteId)
-    const { siteName } = this.state;
+    const { siteName, area } = this.state;
     const newdata = arr.join(" ");
-    if (!siteName.includes(newdata)) {
-      this.setState((pre)=>({
-        siteName: pre.siteName.concat(newdata)
-      }))
-
+    const siteId = {
+      province_id: value[0].id,
+      city_id: value[1].id
+    };
+    if (!siteName.includes(newdata) && !area.includes(siteId)) {
+      this.setState(pre => ({
+        siteName: pre.siteName.concat(newdata),
+        area: pre.area.concat(siteId)
+      }));
     }
   };
   handleSubmit = e => {
@@ -82,13 +43,31 @@ class BaseInfoSet extends Component {
       }
     });
   };
+
+  onTagClose = index => {
+    const { siteName, area } = this.state;
+    const newSiteName = siteName;
+    const newArea = area;
+    newSiteName.splice(index,1)
+    newArea.splice(index,1)
+    this.setState(pre => ({
+      siteName: newSiteName,
+      area: newArea
+    }));
+  };
+  // 验证结束时间
+  disabledDate=(current)=>{
+    const {form}=this.props
+    return current<form.getFieldValue("begin_time")._d
+  }
   render() {
-    const { siteName } = this.state;
-    const { getFieldDecorator } = this.props.form;
+    const { siteName, area } = this.state;
+    console.log(siteName, area);
+    const { getFieldDecorator, getFieldValue } = this.props.form;
     const formItemLayout = {
       labelCol: { span: 10 },
       wrapperCol: { span: 14 }
-    };
+    }
     return (
       <div>
         <Nav />
@@ -97,12 +76,12 @@ class BaseInfoSet extends Component {
             <FormItem {...formItemLayout} label="活动开始时间">
               {getFieldDecorator("begin_time", {
                 rules: [{ required: true, message: "请选择活动开始时间" }]
-              })(<DatePicker showTime format="YYYY-MM-DD HH:mm:ss" />)}
+              })(<DatePicker format="YYYY-MM-DD HH:mm:ss" placeholder="活动开始时间" showTime disabledDate={(current)=> current < new Date()} />)}
             </FormItem>
             <FormItem {...formItemLayout} label="活动结束时间">
               {getFieldDecorator("end_time", {
                 rules: [{ required: true, message: "请选择活动结束时间" }]
-              })(<DatePicker showTime format="YYYY-MM-DD HH:mm:ss" />)}
+              })(<DatePicker format="YYYY-MM-DD HH:mm:ss" showTime placeholder="活动结束时间" disabled={!getFieldValue("begin_time")}  disabledDate={this.disabledDate} />)}
             </FormItem>
             <div className="flex basic-tack">
               <div className="ant-col-10 ant-form-item-label c333">
@@ -157,34 +136,36 @@ class BaseInfoSet extends Component {
                 />
               )}
             </FormItem>
-            <Button type="primary" className="ant-col-offset-10 mb20">
-              添加地区
-            </Button>
             <div className="ant-col-offset-10" style={{ maxWidth: "400px" }}>
               <div className="border-default flex wrap ptb20 plr20 r4 mb10">
                 {siteName &&
                   siteName.length > 0 &&
-                  siteName.map(item => (
-                    <Tag style={{marginBottom:"20px"}} closable onClose={this.onClose}>
+                  siteName.map((item, index) => (
+                    <Tag
+                      key={item}
+                      style={{ marginBottom: "20px" }}
+                      closable
+                      onClose={() => this.onTagClose(index)}
+                    >
                       {item}
                     </Tag>
                   ))}
               </div>
               <div className="font12 c666 mb10">
-                选择限制地区后，非该地区粉丝无法获取海报以及非该地区粉丝助力无效，选择地区点击添加，如需要删除点击对应地区即可
+                选择限制地区后，非该地区粉丝无法获取海报以及非该地区粉丝助力无效，选择地区点击添加，如需要删除点击对应地区即可订阅号无法获取。
               </div>
             </div>
             <FormItem {...formItemLayout} label="活动奖品库存">
-              {getFieldDecorator("task1_num", {
+              {getFieldDecorator("stock", {
                 rules: [
                   {
                     required: true,
-                    message: "请填写一阶邀请任务人数"
+                    message: "请填写库存"
                   }
                 ]
               })(<InputNumber min={0} />)}
               <div className="c666 font12">
-                库存设置为0，则表示不限制库存； 库存减少到0时，系统自动终止活动
+                库存设置为0，则表示不限制库存； 库存减少到0时，系统自动终止活动。
               </div>
             </FormItem>
             <FormItem {...formItemLayout} label="取消扣除人气">

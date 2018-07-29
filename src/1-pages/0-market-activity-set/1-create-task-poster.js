@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { observer, inject } from "mobx-react";
-import axios from "axios";
+import { http } from "4-utils";
 import { SketchPicker } from "react-color";
 import {
   Radio,
@@ -13,119 +13,39 @@ import {
   Switch,
   InputNumber,
   message,
-  Tooltip
+  Tooltip,
+  Modal
 } from "antd";
-import { http } from "4-utils";
 import { Nav } from "0-components";
 
+const confirm = Modal.confirm;
 const RadioGroup = Radio.Group;
 const FormItem = Form.Item;
-const RadioButton = Radio.Button;
 const { TextArea } = Input;
 const CheckboxGroup = Checkbox.Group;
-const getBase64 = (img, callback) => {
-  const reader = new FileReader();
-  reader.addEventListener("load", () => callback(reader.result));
-  reader.readAsDataURL(img);
-};
-const selectCon = arr => {
-  return {
-    is_code: arr.includes("二维码"),
-    is_avatar: arr.includes("头像")
-  };
-};
 class Home extends Component {
   state = {
     wxType: 1,
-    PosterOptions: ["二维码", "头像", "昵称"],
+    PosterOptions: ["头像", "昵称"],
     imageLoading: false,
     ercodeLoading: false,
     poster_id: null,
     isPicker: false,
-    code_font_color: "#333333"
+    code_font_color: "#333333",
+    posterCon: []
   };
   // 当前选中 1.服务号 2.订阅号
   wxChange = e => {
     const { value } = e.target;
     if (value === 1) {
       this.setState(() => ({
-        wxType: value,
-        PosterOptions: ["二维码", "头像", "昵称"]
+        wxType: value
       }));
     } else {
       this.setState(() => ({
-        wxType: value,
-        PosterOptions: ["头像", "昵称"]
+        wxType: value
       }));
     }
-  };
-  // 上传状态改变
-  handleChange = (info, type) => {
-    // type 1.海报 2.二维码
-    if (info.file.status === "uploading") {
-      if (type === 1) {
-        this.setState({ imageLoading: true });
-      } else {
-        this.setState({ ercodeLoading: true });
-      }
-      return;
-    }
-    console.log(info.file.originFileObj);
-    if (info.file.status === "done") {
-      getBase64(info.file.originFileObj, imageUrl => {
-        if (type === 1) {
-          this.setState({
-            imageUrl,
-            imageLoading: false
-          });
-        } else {
-          this.setState({
-            ercodeUrl: imageUrl,
-            ercodeLoading: false
-          });
-        }
-      });
-    }
-  };
-  // 验证图片
-  beforeUpload = (file, fileList, width, height) => {
-    const isImage = file.type === "image/jpeg" || "image/png";
-    if (!isImage) {
-      message.error("请上传png/jpg类型的图片", 2);
-    }
-    const isLt200k = file.size / 1024 < 200;
-    if (!isLt200k) {
-      message.error("图片要小于200k");
-    }
-    const reader = new FileReader();
-    //读取图片数据
-    reader.addEventListener("load", e => {
-      const data = e.target.result;
-      //加载图片获取图片真实宽度和高度
-      const image = new Image();
-      image.addEventListener("load", () => {
-        const w = image.width;
-        const h = image.height;
-        if (w !== width && h !== height) {
-          message.error("请上传符合尺寸的图片", 2, () => {
-            console.info(111);
-            this.setState(
-              pre => ({
-                isSize: !pre.isSize
-              }),
-              () => {
-                console.info(1);
-              }
-            );
-          });
-        }
-      });
-      image.src = data;
-    });
-    reader.readAsDataURL(file);
-    // console.log(this.state.isSize);
-    // console.log(isImage && isLt200k && this.state.isSize);
-    return isImage && isLt200k && this.state.isSize;
   };
   handleSubmit = e => {
     this.setState(() => ({
@@ -139,8 +59,11 @@ class Home extends Component {
       }
     });
   };
-  customRequest = data => {
-    const { file } = data;
+  // 上传图片
+  customRequest = (files, type) => {
+    // type 1.海报上传 2.图片上传
+    const { file } = files;
+    // 限制格式
     const isImage = file.type === "image/jpeg" || "image/png";
     if (!isImage) {
       message.error("请上传png/jpg类型的图片", 2);
@@ -158,17 +81,42 @@ class Home extends Component {
       //加载图片获取图片真实宽度和高度
       const image = new Image();
       image.addEventListener("load", () => {
+        const width = type === 1 ? 640 : 200;
+        const height = type === 1 ? 1080 : 200;
         const w = image.width;
         const h = image.height;
-        if (w !== 208 && h !== 370) {
+        if (w !== width || h !== height) {
           message.error("请上传符合尺寸的图片", 2);
         } else {
-          axios({
-            baseURL: "http://mp.duduapp.net/",
-            url: "upload/image",
-            method: "post",
-            data: file
-          });
+          this.setState(() => ({
+            imageLoading: type === 1,
+            ercodeLoading: type === 2
+          }));
+          let formData = new FormData();
+          formData.append("file", file);
+          // _api=upload
+          http
+            .post("?_api=upload", formData)
+            .then(({ url }) => {
+              if (type === 1) {
+                this.setState(() => ({
+                  imageUrl: url,
+                  imageLoading: false
+                }));
+              } else {
+                this.setState(() => ({
+                  ercodeUrl: url,
+                  ercodeLoading: false
+                }));
+              }
+            })
+            .catch(err => {
+              this.setState(() => ({
+                ercodeLoading: false,
+                imageLoading: false
+              }));
+              message.error("err", 2);
+            });
         }
       });
       image.src = data;
@@ -177,62 +125,97 @@ class Home extends Component {
   };
   // 预览图片需要数据
   getValue = (value, type) => {
+    // 1.图片内容,2字体尺寸,3字体颜色
     switch (type) {
       case 1:
         this.setState(() => ({
           posterCon: value
         }));
+        break;
       case 2:
         this.setState(() => ({
           code_start: value
         }));
+        break;
       case 3:
         this.setState(() => ({
           code_end: value
         }));
+        break;
       case 4:
         this.setState(() => ({
           code_font_size: value
         }));
+        break;
       case 5:
         this.setState(() => ({
           code_font_color: value.hex
         }));
+        break;
+      default:
+        return;
     }
   };
-  handleChangeComplete = (color, event) => {
-    console.log(color);
-    console.log(event);
-  };
-  removeImg = () => {
-    console.log(123);
+  removeImg = type => {
+    confirm({
+      title: "确定删除",
+      content: "你真的要删除该海报吗",
+      okText: "确定",
+      okType: "danger",
+      cancelText: "取消",
+      onOk: () => {
+        if (type === 1) {
+          this.setState(() => ({
+            imageUrl: null
+          }));
+        } else {
+          this.setState(() => ({
+            ercodeUrl: null
+          }));
+        }
+      }
+    });
   };
   // 预览图片
   onPreview = () => {
     const {
       code_font_color,
       code_font_size,
-      code_end,
+      wxType,
       posterCon,
-      code_start
+      imageUrl,
+      ercodeUrl
     } = this.state;
-    if (!code_font_size) {
-      message.error("缺少字体大小", 2);
-      return;
-    } else if (!code_font_color) {
+    if (!imageUrl) {
+      message.error("请上传海报", 2);
+    } else if (wxType === 2 && !code_font_color) {
       message.error("缺少字体颜色", 2);
-      return;
-    } else if (!code_end) {
-      message.error("缺少邀请码开始值", 2);
-      return;
-    } else if (!code_start) {
-      message.error("缺少邀请码结束值", 2);
-      return;
+    } else if (wxType === 2 && !code_font_size) {
+      message.error("缺少字体大小", 2);
+    } else if (wxType === 2 && !ercodeUrl) {
+      message.error("请上传二维码", 2);
+    } else {
+      //mp.dev.duduapp.net/h5backend/L15aP8O79DN1QVyKRbpd?action=poster&operation=preview&type=2&image=https://file.duduapp.net/image/2018/05/03/f5ef981fce98dc805d7714cd319982c0.gif&is_avatar=1&is_nickname=1&is_qrcode=1&code_font_size=36&code_font_color=FF00FF
+      const param = {
+        action: "poster",
+        operation: "preview",
+        type: wxType,
+        image: imageUrl,
+        is_avatar: posterCon.includes("头像") ? 1 : 0,
+        is_nickname: posterCon.includes("昵称") ? 1 : 0
+      };
+      http.getC(
+        "",
+        wxType === 1
+          ? { ...param }
+          : { ...param, code_font_color, code_font_size },
+        ({ url }) => {
+          this.setState(() => ({
+            posterUrl: url
+          }));
+        }
+      );
     }
-    // ...
-  };
-  change = e => {
-    console.log(e);
   };
   colorPicker = () => {
     this.setState(pre => ({
@@ -251,7 +234,8 @@ class Home extends Component {
       poster_id,
       submit,
       isPicker,
-      code_font_color
+      code_font_color,
+      posterUrl
     } = this.state;
     const formItemLayout = {
       labelCol: { span: 4 },
@@ -261,7 +245,6 @@ class Home extends Component {
       labelCol: { span: 5 },
       wrapperCol: { span: 19 }
     };
-    console.log(code_font_color);
     return (
       <div>
         <Nav poster_id={poster_id} submit={submit} />
@@ -301,7 +284,7 @@ class Home extends Component {
                   className="plr20 ptb20 border-default mr20"
                   style={{ width: "320px", minHeight: "540px" }}
                 >
-                  <img style={{ height: "470px" }} src="" alt="" />
+                  <img style={{ height: "470px" }} src={posterUrl} alt="" />
                 </div>
                 {/*3.2 海报上传 */}
                 <div className="plr20 ptb20 border-default equal">
@@ -319,14 +302,12 @@ class Home extends Component {
                       rules: [{ required: true, message: "请上传图片" }]
                     })(
                       <Upload
-                        action="http://mp.duduapp.net/upload/image"
+                        action="http://mp.dev.duduapp.net/h5backend/L15aP8O79DN1QVyKRbpd?_api=upload"
                         listType="picture"
-                        // customRequest={this.customRequest}
+                        customRequest={data => this.customRequest(data, 1)}
                         showUploadList={false}
-                        // onChange={info => this.handleChange(info, 1)}
-                        // beforeUpload={(file, fileList) =>
-                        //   this.beforeUpload(file, fileList, 640, 1080)
-                        // }
+                        disabled={imageLoading}
+                        onChange={this.onChange}
                       >
                         <Button>
                           <Icon
@@ -339,7 +320,7 @@ class Home extends Component {
                   {/* 上传的图片缩略图 */}
                   {imageUrl && (
                     <div
-                      className="relative mb10"
+                      className="relative mb10 ant-col-offset-5"
                       style={{ width: "80px", height: "135px" }}
                     >
                       <img className="w-100 h-100" src={imageUrl} alt="" />
@@ -372,10 +353,8 @@ class Home extends Component {
                             action="http://mp.dev.duduapp.net/upload/image"
                             listType="picture"
                             showUploadList={false}
-                            onChange={info => this.handleChange(info, 2)}
-                            beforeUpload={(file, fileList) =>
-                              this.beforeUpload(file, fileList, 200, 200)
-                            }
+                            disabled={ercodeLoading}
+                            customRequest={data => this.customRequest(data, 2)}
                           >
                             <Button>
                               <Icon
@@ -387,7 +366,7 @@ class Home extends Component {
                       </FormItem>
                       {ercodeUrl && (
                         <div
-                          className="relative mb10"
+                          className="relative mb10 ant-col-offset-5"
                           style={{ width: "50px", height: "50px" }}
                         >
                           <img
@@ -396,7 +375,7 @@ class Home extends Component {
                             alt=""
                           />
                           <div
-                            onClick={this.removeImg}
+                            onClick={() => this.removeImg(1)}
                             className="absolute font20 lh100 common-curson"
                             style={{
                               top: "-10px",
@@ -425,12 +404,9 @@ class Home extends Component {
                               style={{ marginRight: "10px" }}
                               {...formItemLayoutSamll}
                             >
-                              {getFieldDecorator("code_start", {
-                                rules: [
-                                  { required: true, message: "请填写开始值" }
-                                ]
-                              })(
+                              {getFieldDecorator("code_start")(
                                 <InputNumber
+                                  disabled
                                   onChange={value => this.getValue(value, 2)}
                                   placeholder="开始值"
                                   min={0}
@@ -438,13 +414,10 @@ class Home extends Component {
                               )}
                             </FormItem>
                             <FormItem {...formItemLayoutSamll}>
-                              {getFieldDecorator("code_end", {
-                                rules: [
-                                  { required: true, message: "请填写结束值" }
-                                ]
-                              })(
+                              {getFieldDecorator("code_end")(
                                 <InputNumber
                                   min={0}
+                                  disabled
                                   placeholder="结束值"
                                   onChange={value => this.getValue(value, 3)}
                                 />
@@ -505,7 +478,11 @@ class Home extends Component {
                       </div>
                     </div>
                   )}
-                  <Button className="mt30 ant-col-offset-5" type="primary">
+                  <Button
+                    onClick={this.onPreview}
+                    className="mt30 ant-col-offset-5"
+                    type="primary"
+                  >
                     预览
                   </Button>
                 </div>

@@ -40,13 +40,13 @@ class CommonLayout extends Component {
     super(props);
     const { location } = this.props;
     const arr = keysArr(location.pathname);
-    console.log(arr[0], "ciao");
+    // console.log(arr[0], "ciao");
     this.state = {
       handleOpenKeys: arr[0]
     };
   }
   onOpenChange = openKeys => {
-    console.log(openKeys, "openkey");
+    // console.log(openKeys, "openkey");
     this.setState(() => ({ handleOpenKeys: [...openKeys] }));
   };
   handleClick = e => {
@@ -111,7 +111,7 @@ class CommonLayout extends Component {
             <WrapLink
               style={{ background: "#002140" }}
               className="block"
-              to="/"
+              path="/"
             >
               <div
                 className={`admin-logo ${
@@ -172,8 +172,8 @@ class CommonLayout extends Component {
             </Menu>
           </Sider>
           <Layout
-            style={{ marginLeft: menuCollapsed.isCollapsed ? 80 : 220 }}
-            className="transition-margin"
+            style={{ marginLeft: menuCollapsed.isCollapsed ? 80 : 220, minHeight: "100vh" }}
+            className="transition-margin flex jc-between"
           >
             <Header
               style={{ padding: "0 24px 0 0", backgroundColor: "#fff" }}
@@ -184,9 +184,8 @@ class CommonLayout extends Component {
                 type={menuCollapsed.isCollapsed ? "menu-unfold" : "menu-fold"}
                 onClick={this.onToggle}
               />
-              <div>shadow</div>
             </Header>
-            <div className="admin-common-content plr25 ptb20 bg-white">
+            <div className="admin-common-content plr25 ptb20 bg-white equal">
               {children}
             </div>
             <Footer style={{ textAlign: "center" }}>

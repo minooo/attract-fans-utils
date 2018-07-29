@@ -15,7 +15,6 @@ const FirstTaskOk = loadPage("4-first-task-ok");
 const SecondTaskOk = loadPage("5-second-task-ok");
 const ThirdTaskOk = loadPage("6-third-task-ok");
 const MessageReply = loadPage("7-message-reply");
-const AbTest = loadPage("8-ab-test");
 export default [
   {
     path: "/",
@@ -48,9 +47,5 @@ export default [
   {
     path: "/message-reply_:id",
     component: MessageReply
-  },
-  {
-    path: "/8-ab-test_:id",
-    component: AbTest
   }
 ];
