@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import { observer, inject } from "mobx-react";
+import moment from 'moment';
 import { Table, Input, Button, Modal, message } from "antd";
 import { http } from "4-utils";
 import { WrapLink, LoadingFetch } from "0-components";
@@ -17,10 +18,20 @@ class Home extends Component {
   }
   changeStu = data => {
     const { page } = this.state;
-    const { title, id } = data;
-    http.postC("", { action: "poster", operation: "turn", title, id }, () => {
-      this.getDate(page);
-    });
+    const { title, id, state } = data;
+    http.postC(
+      "",
+      {
+        action: "poster",
+        operation: "turn",
+        title,
+        id,
+        state: state === 0 ? 1 : 0
+      },
+      () => {
+        this.getDate(page);
+      }
+    );
   };
   deleteAct = data => {
     const { page } = this.state;
@@ -31,8 +42,9 @@ class Home extends Component {
       okText: "确定",
       okType: "danger",
       cancelText: "取消",
-      onOk() {
+      onOk: () => {
         http.deleteC(
+          "",
           {
             action: "poster",
             operation: "delete",
@@ -46,8 +58,6 @@ class Home extends Component {
       }
     });
   };
-  // action=poster&operation=index
-  // 获取数据
   getDate = (page, title) => {
     this.setState(() => ({
       show: true
@@ -81,10 +91,8 @@ class Home extends Component {
       })
       .catch(err => {
         this.setState(
-          () => ({
-            show: false
-          }),
-          () => message.error(err)
+          () => ({ show: false }),
+          () => message.error("网络出错，请稍后再试！")
         );
       });
   };
@@ -93,6 +101,7 @@ class Home extends Component {
     const { history } = this.props;
     history.push("/create-task-poster");
   };
+  // 搜索
   onSearch = value => {
     if (!value) {
       this.setState(
@@ -110,6 +119,14 @@ class Home extends Component {
         }),
         () => this.getDate(1, value)
       );
+    }
+  };
+  basicSet = data => {
+    const { history } = this.props;
+    if (moment().isAfter(data.begin_time)) {
+      message.error("活动时间开始后不能进行基本设置", 3);
+    } else {
+      history.push(`/base-info-set_${data.id}`);
     }
   };
   render() {
@@ -139,7 +156,7 @@ class Home extends Component {
         align: "center",
         render: data => (
           <WrapLink className="c-main" onClick={() => this.changeStu(data)}>
-            {data.state === 1 ? "开启" : "关闭"}
+            {data.state === 1 ? "关闭" : "开启"}
           </WrapLink>
         )
       },
@@ -148,7 +165,12 @@ class Home extends Component {
         key: "me",
         align: "center",
         render: data => (
-          <WrapLink path={`/base-info-set_${data.id}`}>设置</WrapLink>
+          <WrapLink
+            className="c-main"
+            onClick={() => this.basicSet(data)}
+          >
+            设置
+          </WrapLink>
         )
       },
       {
@@ -244,6 +266,7 @@ class Home extends Component {
           columns={columns}
           dataSource={data}
           bordered
+          rowKey="id"
           size="middle"
         />
       </div>

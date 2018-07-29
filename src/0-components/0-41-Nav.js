@@ -72,8 +72,7 @@ class CommonLayout extends Component {
     if (finish && parseInt(key, 10) === 0) {
       this.setState({
         visible: false
-      });
-      message.error("活动开始后不能修改基本信息", 2);
+      },()=>message.error("活动开始后不能修改基本信息", 2));
     } else {
       this.setState({
         visible: false
@@ -117,14 +116,14 @@ class CommonLayout extends Component {
           ))}
         </Menu>
         <Modal
-          title="真的确定离开？"
+          title="你修改的信息还未提交，你确定要离开吗?"
           visible={this.state.visible}
           onOk={this.routerLink}
           onCancel={this.hideModal}
           okText="确认"
           cancelText="取消"
         >
-          <p>你修改的信息还未提交，离开后所有信息都会消失。你确定要离开吗？</p>
+          <p>如果你还没有提交基本设置，你的活动将不会被创建。</p>
         </Modal>
       </div>
     );

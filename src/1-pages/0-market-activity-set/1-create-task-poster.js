@@ -48,14 +48,70 @@ class Home extends Component {
     }
   };
   handleSubmit = e => {
-    this.setState(() => ({
-      poster_id: 1,
-      submit: true
-    }));
     e.preventDefault();
-    this.props.form.validateFields((err, values) => {
-      if (!err) {
-        console.log("Received values of form: ", values);
+    const {
+      wxType,
+      image,
+      qrcode,
+      posterCon,
+      code_font_color,
+      submit
+    } = this.state;
+    const { history } = this.props;
+    console.log(image);
+    if (submit) {
+      message.info("请不要重复提交", 2);
+      return;
+    }
+    this.props.form.validateFieldsAndScroll((err, values) => {
+      if (err) {
+        message.error("请填写必要信息");
+      } else {
+        if (!image) {
+          message.error("请上传海报", 2);
+          return;
+        }
+        if (wxType === 2 && !qrcode) {
+          message.error("请上传二维码", 2);
+          return;
+        }
+        const {
+          title,
+          code_font_size,
+          keyword,
+          reply_content,
+          is_auto
+        } = values;
+        const param = {
+          action: "poster",
+          operation: "store",
+          type: wxType,
+          title,
+          image,
+          is_auto: is_auto ? 1 : 0,
+          keyword,
+          reply_content,
+          is_avatar: posterCon.includes("头像") ? 1 : 0,
+          is_nickname: posterCon.includes("昵称") ? 1 : 0
+        };
+        http.postC(
+          "",
+          wxType === 1
+            ? { ...param }
+            : { ...param, code_font_color, code_font_size, qrcode },
+          ({ id }) => {
+            this.setState(
+              () => ({
+                submit: true,
+                poster_id: id
+              }),
+              () =>
+                message.success("提交成功,即将前往基本设置页面", 2, () =>
+                  history.replace(`/base-info-set_${id}`)
+                )
+            );
+          }
+        );
       }
     });
   };
@@ -100,12 +156,12 @@ class Home extends Component {
             .then(({ url }) => {
               if (type === 1) {
                 this.setState(() => ({
-                  imageUrl: url,
+                  image: url,
                   imageLoading: false
                 }));
               } else {
                 this.setState(() => ({
-                  ercodeUrl: url,
+                  qrcode: url,
                   ercodeLoading: false
                 }));
               }
@@ -114,8 +170,7 @@ class Home extends Component {
               this.setState(() => ({
                 ercodeLoading: false,
                 imageLoading: false
-              }));
-              message.error("err", 2);
+              }),()=>message.error("网络出错，请稍后再试！", 2));
             });
         }
       });
@@ -156,6 +211,7 @@ class Home extends Component {
         return;
     }
   };
+  // 删除图片
   removeImg = type => {
     confirm({
       title: "确定删除",
@@ -166,11 +222,11 @@ class Home extends Component {
       onOk: () => {
         if (type === 1) {
           this.setState(() => ({
-            imageUrl: null
+            image: null
           }));
         } else {
           this.setState(() => ({
-            ercodeUrl: null
+            qrcode: null
           }));
         }
       }
@@ -183,24 +239,24 @@ class Home extends Component {
       code_font_size,
       wxType,
       posterCon,
-      imageUrl,
-      ercodeUrl
+      image,
+      qrcode
     } = this.state;
-    if (!imageUrl) {
+    if (!image) {
       message.error("请上传海报", 2);
-    } else if (wxType === 2 && !code_font_color) {
-      message.error("缺少字体颜色", 2);
-    } else if (wxType === 2 && !code_font_size) {
-      message.error("缺少字体大小", 2);
-    } else if (wxType === 2 && !ercodeUrl) {
+    } else if (wxType === 2 && !qrcode) {
       message.error("请上传二维码", 2);
+    } else if (wxType === 2 && !code_font_color) {
+      message.error("请填写邀请码字体颜色", 2);
+    } else if (wxType === 2 && !code_font_size) {
+      message.error("请填写邀请码字体大小", 2);
     } else {
       //mp.dev.duduapp.net/h5backend/L15aP8O79DN1QVyKRbpd?action=poster&operation=preview&type=2&image=https://file.duduapp.net/image/2018/05/03/f5ef981fce98dc805d7714cd319982c0.gif&is_avatar=1&is_nickname=1&is_qrcode=1&code_font_size=36&code_font_color=FF00FF
       const param = {
         action: "poster",
         operation: "preview",
         type: wxType,
-        image: imageUrl,
+        image,
         is_avatar: posterCon.includes("头像") ? 1 : 0,
         is_nickname: posterCon.includes("昵称") ? 1 : 0
       };
@@ -208,7 +264,7 @@ class Home extends Component {
         "",
         wxType === 1
           ? { ...param }
-          : { ...param, code_font_color, code_font_size },
+          : { ...param, code_font_color, code_font_size, qrcode },
         ({ url }) => {
           this.setState(() => ({
             posterUrl: url
@@ -217,20 +273,21 @@ class Home extends Component {
       );
     }
   };
+  // 颜色选择
   colorPicker = () => {
     this.setState(pre => ({
       isPicker: !pre.isPicker
     }));
   };
   render() {
-    const { getFieldDecorator } = this.props.form;
+    const { getFieldDecorator, getFieldValue } = this.props.form;
     const {
       wxType,
       PosterOptions,
       imageLoading,
       ercodeLoading,
-      imageUrl,
-      ercodeUrl,
+      image,
+      qrcode,
       poster_id,
       submit,
       isPicker,
@@ -318,14 +375,14 @@ class Home extends Component {
                     )}
                   </FormItem>
                   {/* 上传的图片缩略图 */}
-                  {imageUrl && (
+                  {image && (
                     <div
                       className="relative mb10 ant-col-offset-5"
                       style={{ width: "80px", height: "135px" }}
                     >
-                      <img className="w-100 h-100" src={imageUrl} alt="" />
+                      <img className="w-100 h-100" src={image} alt="" />
                       <div
-                        onClick={this.removeImg}
+                        onClick={() => this.removeImg(1)}
                         className="absolute font20 lh100 common-curson"
                         style={{
                           backgroundColor: "none",
@@ -364,18 +421,14 @@ class Home extends Component {
                           </Upload>
                         )}
                       </FormItem>
-                      {ercodeUrl && (
+                      {qrcode && (
                         <div
                           className="relative mb10 ant-col-offset-5"
                           style={{ width: "50px", height: "50px" }}
                         >
-                          <img
-                            className="w-100 h-100"
-                            src="http://p3oeo2qki.bkt.clouddn.com/18-4-14/95596364.jpg"
-                            alt=""
-                          />
+                          <img className="w-100 h-100" src={qrcode} alt="" />
                           <div
-                            onClick={() => this.removeImg(1)}
+                            onClick={() => this.removeImg(2)}
                             className="absolute font20 lh100 common-curson"
                             style={{
                               top: "-10px",
@@ -434,7 +487,7 @@ class Home extends Component {
                                 <InputNumber
                                   onChange={value => this.getValue(value, 4)}
                                   placeholder="字体大小"
-                                  max={50}
+                                  max={100}
                                   min={0}
                                   style={{
                                     marginRight: "10px"
@@ -495,12 +548,17 @@ class Home extends Component {
             >
               {getFieldDecorator("is_auto")(<Switch />)}
               <div className="c666 font12">
-                活动开始时开启，关闭则不会生成海报
+                说明：活动开始时开启，关闭则不会生成海报
               </div>
             </FormItem>
             <FormItem {...formItemLayout} label="海报关键字">
               {getFieldDecorator("keyword", {
-                rules: [{ required: true, message: "请填写海报关键字" }]
+                rules: [
+                  {
+                    required: !!getFieldValue("is_auto"),
+                    message: "请填写海报关键字"
+                  }
+                ]
               })(
                 <Input
                   style={{ width: "250px" }}
@@ -508,12 +566,17 @@ class Home extends Component {
                 />
               )}
               <div className="c666 font12">
-                海报关键字是在公众号回复关键词可弹出海报，关键词建议为汉字
+                说明：海报关键字是在公众号回复关键词可弹出海报，关键词建议为汉字
               </div>
             </FormItem>
             <FormItem {...formItemLayout} label="生成海报提示">
               {getFieldDecorator("reply_content", {
-                rules: [{ required: true, message: "请填写生成海报提示" }]
+                rules: [
+                  {
+                    required: !!getFieldValue("is_auto"),
+                    message: "请填写生成海报提示"
+                  }
+                ]
               })(
                 <TextArea
                   maxLength={200}
@@ -530,6 +593,9 @@ class Home extends Component {
               <Button type="primary" htmlType="submit">
                 提交
               </Button>
+              <div className="c666 font12">
+                说明：你至少要完成基本设置才能创建活动。
+              </div>
             </FormItem>
           </Form>
         </div>
