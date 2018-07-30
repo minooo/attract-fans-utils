@@ -157,7 +157,7 @@ class Member extends Component {
             )}
           </FormItem>
           {formItems}
-          <FormItem {...submitFormLayout}>
+          <FormItem {...submitFormLayout} extra="示例：key：{{product.DATA}},value：任务完成人数：#人数# ">
             <Button type="dashed" onClick={this.add} style={{ width: "30%" }}>
               <Icon type="plus" /> 添加一条键
             </Button>
@@ -178,6 +178,15 @@ class Member extends Component {
               />
             )}
           </FormItem>
+          <FormItem
+            {...formItemLayout}
+            label="注释"
+            extra="
+以下名词为变量，填写在以上内容，会自动获取信息；
+#时间#、#昵称#、#人数#:当前邀请总人数、#库存#、#完成#:已完成人数、#剩余#：一阶任务剩余人数
+#目标#：一阶任务人数、#二阶目标#：二阶任务人数、#二阶剩余#：二阶任务剩余人数、#三阶目标#、#三阶剩余#
+          "
+          />
           <FormItem {...submitFormLayout} style={{ marginTop: 32 }}>
             <Button type="primary" htmlType="submit" loading={submitting}>
               提交
