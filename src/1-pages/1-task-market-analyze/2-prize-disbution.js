@@ -82,7 +82,6 @@ export default class extends Component {
     }
   };
   setData = async (id, prize_status) => {
-    console.info(id, prize_status);
     const { errcode, msg } = await http.post(null, {
       action: "prize",
       id,
@@ -95,7 +94,6 @@ export default class extends Component {
     }
   };
   onSearch = value => {
-    console.info(value);
     this.setState(
       () => ({
         nickname: value
