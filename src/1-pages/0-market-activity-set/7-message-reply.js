@@ -50,7 +50,6 @@ class Message extends Component {
   };
   // 处理预览
   handlePreview = file => {
-    console.info(file);
     this.setState({
       previewImage: file.url || file.thumbUrl,
       previewVisible: true
@@ -60,7 +59,6 @@ class Message extends Component {
   handleCancel = () => this.setState({ previewVisible: false });
   // 处理上传图片
   handleChange = ({ fileList }) => {
-    console.info(fileList);
     this.setState({ fileList });
   };
 
