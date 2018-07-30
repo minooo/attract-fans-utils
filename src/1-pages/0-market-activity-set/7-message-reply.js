@@ -204,7 +204,7 @@ class Message extends Component {
             extra="任务完成后推送图片。"
           >
             <Upload
-              action="http://mp.dev.duduapp.net/h5backend/L15aP8O79DN1QVyKRbpd?_api=upload"
+              action="?_api=upload"
               listType="picture-card"
               fileList={fileList}
               accept="image/*"
