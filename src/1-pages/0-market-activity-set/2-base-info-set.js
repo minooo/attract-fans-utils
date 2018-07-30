@@ -10,7 +10,7 @@ import {
   message
 } from "antd";
 import { http } from "4-utils";
-import moment from 'moment';
+import moment from "moment";
 import "moment/locale/zh-cn";
 import { city } from "2-static/city";
 import { Nav } from "0-components";
@@ -56,7 +56,13 @@ class BaseInfoSet extends Component {
           is_stock: !!is_stock ? 1 : 0
         };
         http.postC("", param, () => {
-          message.success("保存成功", 2);
+          this.setState(
+            () => ({
+              submit: true,
+              poster_begin: moment().isAfter(begin_time) ? 1 : 0
+            }),
+            () => message.success("保存成功", 2)
+          );
         });
       } else {
         message.error("请填写必要信息", 2);
@@ -89,18 +95,18 @@ class BaseInfoSet extends Component {
   };
   // 验证结束时间
   disabledDate = current => {
-    const {begin_time}=this.state
-    return current < moment(begin_time).endOf('day') || current < moment()
+    const { begin_time } = this.state;
+    return current < moment(begin_time).endOf("day") || current < moment();
   };
-  endTime=(rule,value,callback)=>{
-      const {begin_time}=this.state
-      if(moment(value).isBefore(begin_time)){
-        callback("结束时间应该在开始时间之后")
-      }
-      callback()
-  }
+  endTime = (rule, value, callback) => {
+    const { begin_time } = this.state;
+    if (moment(value).isBefore(begin_time)) {
+      callback("结束时间应该在开始时间之后");
+    }
+    callback();
+  };
   render() {
-    const { siteName, submit } = this.state;
+    const { siteName, submit, poster_begin } = this.state;
     const { getFieldDecorator, getFieldValue } = this.props.form;
     const formItemLayout = {
       labelCol: { span: 10 },
@@ -108,7 +114,7 @@ class BaseInfoSet extends Component {
     };
     return (
       <div>
-        <Nav submit={submit} />
+        <Nav submit={submit} poster_begin={poster_begin} />
         <div className="mt30 plr25 border-default">
           <Form style={{ paddingTop: "40px" }} onSubmit={this.handleSubmit}>
             <FormItem {...formItemLayout} label="活动开始时间">
@@ -126,7 +132,10 @@ class BaseInfoSet extends Component {
             </FormItem>
             <FormItem {...formItemLayout} label="活动结束时间">
               {getFieldDecorator("end_time", {
-                rules: [{ required: true, message: "请选择活动结束时间"},{validator: this.endTime}]
+                rules: [
+                  { required: true, message: "请选择活动结束时间" },
+                  { validator: this.endTime }
+                ]
               })(
                 <DatePicker
                   onChange={(v, time) => this.saveTime(time, 2)}

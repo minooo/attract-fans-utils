@@ -281,7 +281,7 @@ class Home extends Component {
             onSearch={this.onSearch}
           />
           <div className="font16 pl20">
-            当前共有<span className="c-main">123</span>个营销活动
+            当前共有<span className="c-main">{total||0}</span>个营销活动
           </div>
         </div>
         <Table
