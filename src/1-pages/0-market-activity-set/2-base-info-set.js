@@ -39,7 +39,11 @@ class BaseInfoSet extends Component {
   handleSubmit = e => {
     e.preventDefault();
     const { id } = this.props.match.params;
-    const { begin_time, end_time, area } = this.state;
+    const { begin_time, end_time, area, submit } = this.state;
+    if (submit) {
+      message.info("请不要重复提交", 2);
+      return;
+    }
     this.props.form.validateFieldsAndScroll((err, values) => {
       if (!err) {
         const { task1_num, task2_num, task3_num, stock, is_stock } = values;

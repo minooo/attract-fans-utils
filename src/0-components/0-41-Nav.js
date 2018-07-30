@@ -62,7 +62,7 @@ class CommonLayout extends Component {
       message.error("请先提交基本设置信息", 2);
     }
     else if(parseInt(begin, 10) === 1 && parseInt(e.key, 10) === 0){
-      message.error("活动开始时间到达之后不能修改基本信息", 3);
+      message.error("活动开始不能修改基本信息", 3);
     }
     else if (!submit) {
       this.setState({
