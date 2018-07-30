@@ -257,6 +257,12 @@ class Home extends Component {
     ];
     return (
       <div>
+        <WrapLink
+              className="pr5"
+              path="/task-ok-analyze"
+            >
+              asdf
+            </WrapLink>
         {show && <LoadingFetch />}
         <div
           className="h60 font18 pl10 flex r4 ai-center jc-between"

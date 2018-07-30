@@ -49,6 +49,13 @@ class CommonLayout extends Component {
     // console.log(openKeys, "openkey");
     this.setState(() => ({ handleOpenKeys: [...openKeys] }));
   };
+  componentDidUpdate(preProps) {
+    const { location } = this.props;
+    if (location.pathname !== preProps.location.pathname) {
+      const arr = keysArr(location.pathname);
+      this.setState(() => ({ handleOpenKeys: arr[0] }));
+    }
+  }
   handleClick = e => {
     const { history } = this.props;
     const key = e.key.slice(0, 1);
