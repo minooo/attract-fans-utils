@@ -48,11 +48,23 @@ class CommonLayout extends Component {
   };
   // 路由点击事件
   handleClick = e => {
+    const { location } = this.props;
     const { id } = this.props.match.params;
+    const { begin } = searchToObj(decodeURIComponent(window.location.hash));
     const { submit, poster_id } = this.props;
     if (!id && !poster_id) {
       message.error("你还未创建海报", 2);
-    } else if (!submit) {
+    } else if (
+      !submit &&
+      location.pathname.includes("/base-info-set") &&
+      !begin
+    ) {
+      message.error("请先提交基本设置信息", 2);
+    }
+    else if(parseInt(begin, 10) === 1 && parseInt(e.key, 10) === 0){
+      message.error("活动开始不能修改基本信息", 3);
+    }
+    else if (!submit) {
       this.setState({
         visible: true,
         key: e.key
@@ -68,26 +80,16 @@ class CommonLayout extends Component {
   };
   // 路由跳转事件
   routerLink = () => {
-    const { history, poster_id } = this.props;
-    const { begin } = searchToObj(decodeURIComponent(window.location.hash))
-
+    const { history, poster_id, poster_begin } = this.props;
     const { id } = this.props.match.params;
+    const  begin  = searchToObj(decodeURIComponent(window.location.hash)).begin || poster_begin;
     const { key } = this.state;
-    if (parseInt(begin, 10)===1 && parseInt(key, 10) === 0) {
-      this.setState(
-        {
-          visible: false
-        },
-        () => message.error("活动开始后不能修改基本信息", 2)
-      );
-    } else {
       this.setState({
         visible: false
       });
       const paramId = id || poster_id;
       const path = config[parseInt(key, 10)].path;
       history.push(`${path}_${paramId}?begin=${begin}`);
-    }
   };
 
   // 筛选当前的key
@@ -121,14 +123,14 @@ class CommonLayout extends Component {
           ))}
         </Menu>
         <Modal
-          title="你修改的信息还未提交，你确定要离开吗?"
+          title="你确定要离开吗?"
           visible={this.state.visible}
           onOk={this.routerLink}
           onCancel={this.hideModal}
           okText="确认"
           cancelText="取消"
         >
-          <p>如果你还没有提交基本设置，你的活动将不会被创建。</p>
+          <p>你修改的信息还未提交，如果离开这些信息将会消失。</p>
         </Modal>
       </div>
     );
