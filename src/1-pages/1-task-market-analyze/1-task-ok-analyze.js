@@ -9,6 +9,7 @@ import {
   Table,
   Select
 } from "antd";
+import { LoadingFetch } from "0-components";
 import { Chart, Geom, Axis, Tooltip } from "bizcharts";
 import { http, common } from "4-utils";
 import moment from "moment";
@@ -24,6 +25,7 @@ const cols = {
 
 export default class extends Component {
   state = {
+    show: false,
     proster_id: 0,
     salesType: "sum_num",
     rangePickerValue: common.getTimeDistance("week"),
@@ -39,6 +41,9 @@ export default class extends Component {
     this.getData();
   }
   getData = async () => {
+    this.setState(() => ({
+      show: true
+    }));
     const { proster_id, chart_time, list_time } = this.state;
     const { errcode, msg, result } = await http.get(null, {
       action: "statics",
@@ -48,15 +53,13 @@ export default class extends Component {
       list_time
     });
     if (parseInt(errcode, 10) === 0 && msg === "success") {
-      if (result.posters.length > 0) {
-        this.setState({
-          posters: result.posters,
-          stat_data: result.stat_data,
-          chart_data: result.chart_data,
-          list_data: result.list_data
-        });
-      } else {
-      }
+      this.setState({
+        show: false,
+        posters: result.posters,
+        stat_data: result.stat_data,
+        chart_data: result.chart_data,
+        list_data: result.list_data
+      });
     } else {
       message.error(msg);
     }
@@ -132,8 +135,22 @@ export default class extends Component {
       return "currentDate";
     }
   };
+  // 判断任务
+  isTask = type => {
+    switch (parseInt(type, 10)) {
+      case 1:
+        return "一阶任务";
+      case 2:
+        return "二阶任务";
+      case 3:
+        return "三阶任务";
+      default:
+        return "这个字段有错误";
+    }
+  };
   render() {
     const {
+      show,
       salesType,
       rangePickerValue,
       rangePickerValue1,
@@ -143,23 +160,24 @@ export default class extends Component {
       list_data
     } = this.state;
     const logColumns = [
-      { title: "用户昵称", dataIndex: "fan_nickname" },
+      { title: "用户昵称", dataIndex: "fan_nickname",key:"fan_nickname" },
       {
         title: "完成任务",
-        dataIndex: "fan_nickname",
-        key: "fan_nickname",
-        render: data => <span>{data.task_type ? "开启" : "关闭"}</span>
+        dataIndex: "task_type",
+        key: "task_type",
+        render: data => <span>{this.isTask(data)}</span>
       },
-      { title: "完成时间", dataIndex: "created_at" },
+      { title: "完成时间", dataIndex: "created_at", key: "created_at" },
       {
         title: "奖品领取情况",
         dataIndex: "prize_status",
         key: "prize_status",
-        render: data => <span>{data.prize_status ? "开启" : "关闭"}</span>
+        render: data => <span>{data ? "已发放" : "未发放"}</span>
       }
     ];
     return (
-      <div>
+      <div style={{ minWidth: "996px" }}>
+        {show && <LoadingFetch />}
         <div className="admin-common-tip bg-white border-bottom-one">
           <Breadcrumb>
             <Breadcrumb.Item>管理中心</Breadcrumb.Item>
@@ -184,6 +202,7 @@ export default class extends Component {
           )}
         </div>
         <div className=" plr25 ptb15">
+          <div className=" font16">历史数据统计</div>
           <div className=" flex wrap ptb20 ">
             <div className="pl15 pr30">
               <div className=" font30 c333 ">
@@ -231,24 +250,24 @@ export default class extends Component {
             </div>
             <div className=" flex ai-center">
               <div className="salesExtra">
-                <a
+                <button
                   className={this.isActive("today")}
                   onClick={() => this.selectDate("today")}
                 >
                   今日
-                </a>
-                <a
+                </button>
+                <button
                   className={this.isActive("week")}
                   onClick={() => this.selectDate("week")}
                 >
                   本周
-                </a>
-                <a
+                </button>
+                <button
                   className={this.isActive("month")}
                   onClick={() => this.selectDate("month")}
                 >
                   本月
-                </a>
+                </button>
               </div>
               <RangePicker
                 value={rangePickerValue}
@@ -308,7 +327,7 @@ export default class extends Component {
         </div>
         {list_data && (
           <Table
-            rowKey="date"
+            rowKey="id"
             columns={logColumns}
             dataSource={list_data}
             pagination={true}

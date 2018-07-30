@@ -1,5 +1,6 @@
 import React, { Component, Fragment } from "react";
-import { Input, Form, Button, Upload, Icon, Modal } from "antd";
+import { Input, Form, Button, Upload, Icon, Modal, message } from "antd";
+import { http } from "4-utils";
 import { Nav } from "0-components";
 
 const FormItem = Form.Item;
@@ -16,6 +17,36 @@ class Message extends Component {
   componentDidMount() {}
   handleSubmit = e => {
     e.preventDefault();
+    const { form } = this.props;
+    form.validateFieldsAndScroll(
+      { first: true, force: true },
+      (err, values) => {
+        if (!err) {
+          const { fileList } = this.state;
+          const { follow, task_content, cancel, repeat, poster_end } = values;
+          if(fileList.length > 0){
+            var task_image = fileList[0].response.url
+          }
+          const { id } = this.props.match.params;
+          http.postC(
+            null,
+            {
+              action: "customSetting",
+              poster_id: id,
+              follow,
+              task_content,
+              task_image,
+              cancel,
+              repeat,
+              poster_end
+            },
+            data => {
+              message.success("模板信息设置成功");
+            }
+          );
+        }
+      }
+    );
   };
   // 处理预览
   handlePreview = file => {
@@ -175,7 +206,7 @@ class Message extends Component {
             extra="任务完成后推送图片。"
           >
             <Upload
-              action="http://mp.duduapp.net/upload/image"
+              action="http://mp.dev.duduapp.net/h5backend/L15aP8O79DN1QVyKRbpd?_api=upload"
               listType="picture-card"
               fileList={fileList}
               accept="image/*"

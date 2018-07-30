@@ -21,7 +21,7 @@
   bottom: 0;
   right: 0;
 }
-.common-cover{
+.common-cover {
   position: fixed;
   top: 0;
   left: 0;
@@ -58,18 +58,18 @@
 .common-brand-bg {
   background: url("../../images/common_brand.png") 0 0 no-repeat;
 }
-.common-no-data{
+.common-no-data {
   background-image: url("../../images/common_nodata_img.png");
   background-repeat: no-repeat;
   background-size: 100%;
   width: 200px;
   height: 200px;
 }
-.common-warning{
-  color:#f5222d;
-  margin: 0 0 0 20.83333333%
+.common-warning {
+  color: #f5222d;
+  margin: 0 0 0 20.83333333%;
 }
-.common-curson{
+.common-curson {
   cursor: pointer;
 }
 // admin 样式
@@ -184,7 +184,7 @@
   top: 4px;
   font-size: 24px;
   color: #999;
-  transition: all .3s;
+  transition: all 0.3s;
 }
 .dynamic-delete-button:hover {
   color: #777;
@@ -197,8 +197,8 @@
 .salesExtra {
   display: inline-block;
   margin-right: 24px;
-  a {
-    color: rgba(0,0,0,.65);
+  button {
+    color: rgba(0, 0, 0, 0.65);
     margin-left: 24px;
     font-size: 14px;
     &:hover {
