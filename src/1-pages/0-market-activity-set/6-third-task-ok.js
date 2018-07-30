@@ -1,5 +1,6 @@
-import React, { Component,Fragment } from "react";
-import { Input, Form, Button, Icon } from "antd";
+import React, { Component, Fragment } from "react";
+import { Input, Form, Button, Icon, message } from "antd";
+import { http } from "4-utils";
 import { Nav } from "0-components";
 
 const FormItem = Form.Item;
@@ -17,13 +18,35 @@ class Member extends Component {
     const { form } = this.props;
     form.validateFieldsAndScroll((err, values) => {
       if (!err) {
-        console.info(values);
+        const content = {
+          first: values.first,
+          [values.key[0]]: values.valu[0],
+          remark: values.remark
+        };
+        if (values.key.length > 0) {
+          values.key.map((item, index) => {
+            return (content[item] = values.valu[index]);
+          });
+        }
+        const { id } = this.props.match.params;
+        http.postC(
+          null,
+          {
+            action: "templete",
+            poster_id: id,
+            templete_id: values.templete_id,
+            type: 3,
+            content
+          },
+          data => {
+            message.success("模板信息设置成功");
+          }
+        );
       }
     });
   };
   // 删除
   remove = k => {
-    console.info(k);
     const { form } = this.props;
     // 可以使用数据绑定来获取吗
     const keys = form.getFieldValue("keys");
@@ -72,10 +95,9 @@ class Member extends Component {
     const { submitting, submit } = this.state;
     getFieldDecorator("keys", { initialValue: [0] });
     const keys = getFieldValue("keys");
-    console.info(keys);
     const formItems = keys.map((k, index) => {
       return (
-        <FormItem {...formItemLayout} label={`keyword ${k}`} key={k}>
+        <FormItem {...formItemLayout} label={`参数 ${k}`} key={k}>
           {getFieldDecorator(`key[${k}]`, {
             validateTrigger: ["onChange", "onBlur"]
           })(
@@ -102,7 +124,7 @@ class Member extends Component {
     });
     return (
       <Fragment>
-        <Nav  submit={submit} />
+        <Nav submit={submit} />
         <Form onSubmit={this.handleSubmit} style={{ marginTop: 8 }}>
           <FormItem
             {...formItemLayout}
@@ -135,13 +157,13 @@ class Member extends Component {
             )}
           </FormItem>
           {formItems}
-          <FormItem {...submitFormLayout}>
+          <FormItem {...submitFormLayout} extra="示例：key：{{product.DATA}},value：任务完成人数：#人数# ">
             <Button type="dashed" onClick={this.add} style={{ width: "30%" }}>
               <Icon type="plus" /> 添加一条键
             </Button>
           </FormItem>
           <FormItem {...formItemLayout} label="尾部">
-            {getFieldDecorator("first", {
+            {getFieldDecorator("remark", {
               rules: [
                 {
                   required: true,
@@ -156,6 +178,15 @@ class Member extends Component {
               />
             )}
           </FormItem>
+          <FormItem
+            {...formItemLayout}
+            label="注释"
+            extra="
+以下名词为变量，填写在以上内容，会自动获取信息；
+#时间#、#昵称#、#人数#:当前邀请总人数、#库存#、#完成#:已完成人数、#剩余#：一阶任务剩余人数
+#目标#：一阶任务人数、#二阶目标#：二阶任务人数、#二阶剩余#：二阶任务剩余人数、#三阶目标#、#三阶剩余#
+          "
+          />
           <FormItem {...submitFormLayout} style={{ marginTop: 32 }}>
             <Button type="primary" htmlType="submit" loading={submitting}>
               提交

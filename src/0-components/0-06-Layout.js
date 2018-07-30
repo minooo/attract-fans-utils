@@ -40,13 +40,13 @@ class CommonLayout extends Component {
     super(props);
     const { location } = this.props;
     const arr = keysArr(location.pathname);
-    console.log(arr[0], "ciao");
+    // console.log(arr[0], "ciao");
     this.state = {
       handleOpenKeys: arr[0]
     };
   }
   onOpenChange = openKeys => {
-    console.log(openKeys, "openkey");
+    // console.log(openKeys, "openkey");
     this.setState(() => ({ handleOpenKeys: [...openKeys] }));
   };
   handleClick = e => {
@@ -65,9 +65,6 @@ class CommonLayout extends Component {
         break;
       case "12":
         history.push("/prize-disbution");
-        break;
-      case "2":
-        history.push("/shielding-detection");
         break;
       default:
         console.info("menu click");
@@ -111,7 +108,7 @@ class CommonLayout extends Component {
             <WrapLink
               style={{ background: "#002140" }}
               className="block"
-              to="/"
+              path="/"
             >
               <div
                 className={`admin-logo ${

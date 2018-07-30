@@ -6,23 +6,22 @@ import {
   InputNumber,
   DatePicker,
   Cascader,
-  Tag
+  Tag,
+  message
 } from "antd";
-import locale from 'antd/lib/date-picker/locale/zh_CN';
-import { city } from "../../2-static/city";
+import { http } from "4-utils";
+import moment from "moment";
+import "moment/locale/zh-cn";
+import { city } from "2-static/city";
 import { Nav } from "0-components";
-
 const FormItem = Form.Item;
 
 class BaseInfoSet extends Component {
   state = {
     siteName: [],
-    area: [],
-    begin_time:null,
-    begin_time_d:null
+    area: []
   };
-  componentDidMount() {}
-  onChange = (arr, value) => {
+  citOnChange = (arr, value) => {
     const { siteName, area } = this.state;
     const newdata = arr.join(" ");
     const siteId = {
@@ -36,59 +35,128 @@ class BaseInfoSet extends Component {
       }));
     }
   };
+  // 表单选择
   handleSubmit = e => {
     e.preventDefault();
-    this.props.form.validateFields((err, values) => {
+    const { id } = this.props.match.params;
+    const { begin_time, end_time, area, submit } = this.state;
+    if (submit) {
+      message.info("请不要重复提交", 2);
+      return;
+    }
+    this.props.form.validateFieldsAndScroll((err, values) => {
       if (!err) {
-        console.log("Received values of form: ", values);
+        const { task1_num, task2_num, task3_num, stock, is_stock } = values;
+        const param = {
+          action: "baseSetting",
+          poster_id: id,
+          begin_time,
+          end_time,
+          task1_num,
+          task2_num,
+          task3_num,
+          stock,
+          area,
+          is_stock: !!is_stock ? 1 : 0
+        };
+        http.postC("", param, () => {
+          this.setState(
+            () => ({
+              submit: true,
+              poster_begin: moment().isAfter(begin_time) ? 1 : 0
+            }),
+            () => message.success("保存成功", 2)
+          );
+        });
+      } else {
+        message.error("请填写必要信息", 2);
       }
     });
   };
-
+  // 存储时间
+  saveTime = (time, type) => {
+    if (type === 1) {
+      this.setState(() => ({
+        begin_time: time
+      }));
+    } else {
+      this.setState(() => ({
+        end_time: time
+      }));
+    }
+  };
+  // 删除标签
   onTagClose = index => {
     const { siteName, area } = this.state;
     const newSiteName = siteName;
     const newArea = area;
-    newSiteName.splice(index,1)
-    newArea.splice(index,1)
+    newSiteName.splice(index, 1);
+    newArea.splice(index, 1);
     this.setState(pre => ({
       siteName: newSiteName,
       area: newArea
     }));
   };
   // 验证结束时间
-  disabledDate=(current)=>{
-    const {form}=this.props
-    return current<form.getFieldValue("begin_time")._d
-  }
+  disabledDate = current => {
+    const { begin_time } = this.state;
+    return current < moment(begin_time).endOf("day") || current < moment();
+  };
+  endTime = (rule, value, callback) => {
+    const { begin_time } = this.state;
+    if (moment(value).isBefore(begin_time)) {
+      callback("结束时间应该在开始时间之后");
+    }
+    callback();
+  };
   render() {
-    const { siteName, area } = this.state;
-    console.log(siteName, area);
+    const { siteName, submit, poster_begin } = this.state;
     const { getFieldDecorator, getFieldValue } = this.props.form;
     const formItemLayout = {
       labelCol: { span: 10 },
       wrapperCol: { span: 14 }
-    }
+    };
     return (
       <div>
-        <Nav />
+        <Nav submit={submit} poster_begin={poster_begin} />
         <div className="mt30 plr25 border-default">
           <Form style={{ paddingTop: "40px" }} onSubmit={this.handleSubmit}>
             <FormItem {...formItemLayout} label="活动开始时间">
               {getFieldDecorator("begin_time", {
                 rules: [{ required: true, message: "请选择活动开始时间" }]
-              })(<DatePicker locale={locale} format="YYYY-MM-DD HH:mm:ss" placeholder="活动开始时间" showTime disabledDate={(current)=> current < new Date()} />)}
+              })(
+                <DatePicker
+                  onChange={(v, time) => this.saveTime(time, 1)}
+                  format="YYYY-MM-DD HH:mm:ss"
+                  showTime
+                  showToday
+                  placeholder="活动开始时间"
+                />
+              )}
             </FormItem>
             <FormItem {...formItemLayout} label="活动结束时间">
               {getFieldDecorator("end_time", {
-                rules: [{ required: true, message: "请选择活动结束时间" }]
-              })(<DatePicker format="YYYY-MM-DD HH:mm:ss" showTime placeholder="活动结束时间" disabled={!getFieldValue("begin_time")}  disabledDate={this.disabledDate} />)}
+                rules: [
+                  { required: true, message: "请选择活动结束时间" },
+                  { validator: this.endTime }
+                ]
+              })(
+                <DatePicker
+                  onChange={(v, time) => this.saveTime(time, 2)}
+                  format="YYYY-MM-DD HH:mm:ss"
+                  showTime
+                  showToday
+                  placeholder="活动结束时间"
+                  disabled={!getFieldValue("begin_time")}
+                  disabledDate={this.disabledDate}
+                />
+              )}
             </FormItem>
             <div className="flex basic-tack">
               <div className="ant-col-10 ant-form-item-label c333">
                 <label className="ant-form-item-required">活动任务目标</label>
               </div>
-              <div className=" equal">
+              <div className="equal">
                 <FormItem {...formItemLayout}>
                   <span className="ant-input-group-addon">一阶邀请</span>
                   {getFieldDecorator("task1_num", {
@@ -132,7 +200,7 @@ class BaseInfoSet extends Component {
                 <Cascader
                   style={{ maxWidth: "400px" }}
                   options={city}
-                  onChange={this.onChange}
+                  onChange={this.citOnChange}
                   placeholder="请选择开放地区"
                 />
               )}
@@ -153,7 +221,7 @@ class BaseInfoSet extends Component {
                   ))}
               </div>
               <div className="font12 c666 mb10">
-                选择限制地区后，非该地区粉丝无法获取海报以及非该地区粉丝助力无效，选择地区点击添加，如需要删除点击对应地区即可
+                说明：选择限制地区后，非该地区粉丝无法获取海报以及非该地区粉丝助力无效，选择地区点击添加，如需要删除点击对应地区即可订阅号无法获取。
               </div>
             </div>
             <FormItem {...formItemLayout} label="活动奖品库存">
@@ -166,13 +234,14 @@ class BaseInfoSet extends Component {
                 ]
               })(<InputNumber min={0} />)}
               <div className="c666 font12">
-                库存设置为0，则表示不限制库存； 库存减少到0时，系统自动终止活动
+                说明：库存设置为0，则表示不限制库存；
+                库存减少到0时，系统自动终止活动。
               </div>
             </FormItem>
             <FormItem {...formItemLayout} label="取消扣除人气">
-              {getFieldDecorator("is_auto")(<Switch />)}
+              {getFieldDecorator("is_stock")(<Switch />)}
               <div className="c666 font12">
-                开启后，取关扣除人气值，重新扫码只算一次助力，能有效避免粉丝取消关注。
+                说明：开启后，取关扣除人气值，重新扫码只算一次助力，能有效避免粉丝取消关注。
               </div>
             </FormItem>
             <FormItem wrapperCol={{ span: 14, offset: 10 }}>
