@@ -11,21 +11,20 @@ const { Search } = Input;
 class Home extends Component {
   state = {
     show: false,
-    page: 1
+    page: 1,
+    winWidth: document.body.clientWidth
   };
   componentDidMount() {
+    window.addEventListener("resize", this.getWidth ,false)
     this.getDate();
-    Window.addEventListener("resize", ()=>{
-      this.setState(()=>({
-        winWidth:document.body.clientWidth
-      }))
-    },false)
   }
   componentWillUnmount() {
-    Window.removeEventListener("resize", this.btnMove);
+    window.removeEventListener("resize", this.getWidth);
   }
   getWidth=()=>{
-
+    this.setState(()=>({
+      winWidth:document.body.clientWidth
+    }))
   }
   changeStu = data => {
     const { page } = this.state;
@@ -146,7 +145,7 @@ class Home extends Component {
     }
   };
   render() {
-    const { show, data, total, per_page, page } = this.state;
+    const { show, data, total, per_page, page, winWidth } = this.state;
     const columns = [
       {
         title: "任务名称",
@@ -265,6 +264,7 @@ class Home extends Component {
         )
       }
     ];
+    console.log(winWidth)
     return (
       <div>
         {show && <LoadingFetch />}
@@ -305,7 +305,7 @@ class Home extends Component {
             total,
             size: "default "
           }}
-          scroll={{  x:1100  }}
+          scroll={{ x: winWidth < 1400 ? 1100 : 0 }}
           columns={columns}
           dataSource={data}
           bordered

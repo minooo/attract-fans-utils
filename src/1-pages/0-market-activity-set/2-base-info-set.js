@@ -9,12 +9,15 @@ import {
   Tag,
   message
 } from "antd";
-import { http } from "4-utils";
+import { http, common } from "4-utils";
 import moment from "moment";
 import "moment/locale/zh-cn";
 import { city } from "2-static/city";
 import { Nav, LoadingFetch } from "0-components";
+
+
 const FormItem = Form.Item;
+const { searchToObj } = common;
 
 class BaseInfoSet extends Component {
   state = {
@@ -23,8 +26,9 @@ class BaseInfoSet extends Component {
     show: false
   };
   componentDidMount() {
+    const { begin } = searchToObj(window.location.hash)
     const { id } = this.props.match.params;
-    if (id) {
+    if (id && begin) {
       this.setState(() => ({
         show: true
       }));
@@ -38,6 +42,7 @@ class BaseInfoSet extends Component {
             const { setting } = res.base_setting;
             this.setState(() => ({
               setting,
+              submit: true,
               show: false
             }));
           } else {
