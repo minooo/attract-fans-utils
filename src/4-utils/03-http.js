@@ -18,7 +18,7 @@ const callApi = (url, method, data, options = {}) => {
     Object.assign(
       {},
       {
-        baseURL: "/L15aP8O79DN1QVyKRbpd/",
+        baseURL: "/L15aP8O79DN1QVyKRbpd",
         url,
         method,
         params: method === "get" ? data : {}, // 添加在请求URL后面的参数
