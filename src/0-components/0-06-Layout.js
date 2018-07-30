@@ -16,7 +16,7 @@ const keysArr = path => {
   } else if (path.includes("/prize-disbution")) {
     return [["1"], ["12"], "奖品发放情况"];
   }
-  return [["0"], ["00"], "首页"];
+  return [["0"], ["0"], "首页"];
 };
 
 class CommonLayout extends Component {
@@ -34,7 +34,13 @@ class CommonLayout extends Component {
     console.log(openKeys, "展开二级菜单执行的事件");
     this.setState(() => ({ handleOpenKeys: [...openKeys] }));
   };
-  // 点击执行的事件
+  componentDidUpdate(preProps) {
+    const { location } = this.props;
+    if (location.pathname !== preProps.location.pathname) {
+      const arr = keysArr(location.pathname);
+      this.setState(() => ({ handleOpenKeys: arr[0] }));
+    }
+  }
   handleClick = e => {
     const { history } = this.props;
     const key = e.key.slice(0, 1);
