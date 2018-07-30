@@ -96,7 +96,7 @@ export default class extends Component {
   };
   onSearch = value => {
     console.info(value);
-    this.setData(
+    this.setState(
       () => ({
         nickname: value
       }),

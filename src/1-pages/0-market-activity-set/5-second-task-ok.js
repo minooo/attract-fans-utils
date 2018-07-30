@@ -1,5 +1,6 @@
-import React, { Component,Fragment } from "react";
-import { Input, Form, Button, Icon } from "antd";
+import React, { Component, Fragment } from "react";
+import { Input, Form, Button, Icon, message } from "antd";
+import { http } from "4-utils";
 import { Nav } from "0-components";
 
 const FormItem = Form.Item;
@@ -18,6 +19,30 @@ class Member extends Component {
     form.validateFieldsAndScroll((err, values) => {
       if (!err) {
         console.info(values);
+        const content = {
+          first: values.first,
+          [values.key[0]]: values.valu[0],
+          remark: values.remark
+        };
+        if (values.key.length > 0) {
+          values.key.map((item, index) => {
+            return (content[item] = values.valu[index]);
+          });
+        }
+        const { id } = this.props.match.params;
+        http.postC(
+          null,
+          {
+            action: "templete",
+            poster_id: id,
+            templete_id: values.templete_id,
+            type: 2,
+            content
+          },
+          data => {
+            message.success("模板信息设置成功");
+          }
+        );
       }
     });
   };
@@ -75,7 +100,7 @@ class Member extends Component {
     console.info(keys);
     const formItems = keys.map((k, index) => {
       return (
-        <FormItem {...formItemLayout} label={`keyword ${k}`} key={k}>
+        <FormItem {...formItemLayout} label={`参数 ${k}`} key={k}>
           {getFieldDecorator(`key[${k}]`, {
             validateTrigger: ["onChange", "onBlur"]
           })(
@@ -102,7 +127,7 @@ class Member extends Component {
     });
     return (
       <Fragment>
-        <Nav  submit={submit} />
+        <Nav submit={submit} />
         <Form onSubmit={this.handleSubmit} style={{ marginTop: 8 }}>
           <FormItem
             {...formItemLayout}
@@ -141,7 +166,7 @@ class Member extends Component {
             </Button>
           </FormItem>
           <FormItem {...formItemLayout} label="尾部">
-            {getFieldDecorator("first", {
+            {getFieldDecorator("remark", {
               rules: [
                 {
                   required: true,
