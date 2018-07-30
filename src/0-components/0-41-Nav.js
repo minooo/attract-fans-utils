@@ -2,7 +2,9 @@ import React, { Component } from "react";
 import { Menu, Modal, message } from "antd";
 import { withRouter } from "react-router-dom";
 import { observer, inject } from "mobx-react";
+import { common } from "4-utils";
 
+const { searchToObj } = common;
 const config = [
   {
     text: "基本信息设置",
@@ -66,22 +68,25 @@ class CommonLayout extends Component {
   };
   // 路由跳转事件
   routerLink = () => {
-    const { finish, history, poster_id, location } = this.props;
+    const { history, poster_id } = this.props;
+    const { begin } = searchToObj(decodeURIComponent(window.location.hash))
+
     const { id } = this.props.match.params;
     const { key } = this.state;
-    if (finish && parseInt(key, 10) === 0) {
-      this.setState({
-        visible: false
-      },()=>message.error("活动开始后不能修改基本信息", 2));
+    if (parseInt(begin, 10)===1 && parseInt(key, 10) === 0) {
+      this.setState(
+        {
+          visible: false
+        },
+        () => message.error("活动开始后不能修改基本信息", 2)
+      );
     } else {
       this.setState({
         visible: false
       });
       const paramId = id || poster_id;
-      const path=config[parseInt(key, 10)].path
-      location.pathname.includes("/create-task-poster")
-        ? history.replace(`${path}_${paramId}`)
-        : history.push(`${path}_${paramId}`);
+      const path = config[parseInt(key, 10)].path;
+      history.push(`${path}_${paramId}?begin=${begin}`);
     }
   };
 

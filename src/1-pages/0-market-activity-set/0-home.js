@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { observer, inject } from "mobx-react";
-import moment from 'moment';
+import moment from "moment";
 import { Table, Input, Button, Modal, message } from "antd";
 import { http } from "4-utils";
 import { WrapLink, LoadingFetch } from "0-components";
@@ -16,6 +16,7 @@ class Home extends Component {
   componentDidMount() {
     this.getDate();
   }
+
   changeStu = data => {
     const { page } = this.state;
     const { title, id, state } = data;
@@ -121,12 +122,17 @@ class Home extends Component {
       );
     }
   };
+  // 基本设置
   basicSet = data => {
     const { history } = this.props;
     if (moment().isAfter(data.begin_time)) {
       message.error("活动时间开始后不能进行基本设置", 3);
     } else {
-      history.push(`/base-info-set_${data.id}`);
+      history.push(
+        `/base-info-set_${data.id}?begin=${
+          moment().isAfter(data.begin_time) ? 1 : 0
+        }`
+      );
     }
   };
   render() {
@@ -165,10 +171,7 @@ class Home extends Component {
         key: "me",
         align: "center",
         render: data => (
-          <WrapLink
-            className="c-main"
-            onClick={() => this.basicSet(data)}
-          >
+          <WrapLink className="c-main" onClick={() => this.basicSet(data)}>
             设置
           </WrapLink>
         )
@@ -178,7 +181,13 @@ class Home extends Component {
         key: "add",
         align: "center",
         render: data => (
-          <WrapLink path={`member-join-tip_${data.id}`}>设置</WrapLink>
+          <WrapLink
+            path={`member-join-tip_${data.id}?begin=${
+              moment().isAfter(data.begin_time) ? 1 : 0
+            }`}
+          >
+            设置
+          </WrapLink>
         )
       },
       {
@@ -187,13 +196,29 @@ class Home extends Component {
         align: "center",
         render: data => (
           <div>
-            <WrapLink className="pr5" path={`member-join-tip_${data.id}`}>
+            <WrapLink
+              className="pr5"
+              path={`member-join-tip_${data.id}?begin=${
+                moment().isAfter(data.begin_time) ? 1 : 0
+              }`}
+            >
               一阶任务
             </WrapLink>
-            <WrapLink className="pr5" path={`member-join-tip_${data.id}`}>
+            <WrapLink
+              className="pr5"
+              path={`member-join-tip_${data.id}?begin=${
+                moment().isAfter(data.begin_time) ? 1 : 0
+              }`}
+            >
               二阶任务
             </WrapLink>
-            <WrapLink path={`member-join-tip_${data.id}`}>三阶任务</WrapLink>
+            <WrapLink
+              path={`member-join-tip_${data.id}?begin=${
+                moment().isAfter(data.begin_time) ? 1 : 0
+              }`}
+            >
+              三阶任务
+            </WrapLink>
           </div>
         )
       },
@@ -202,7 +227,13 @@ class Home extends Component {
         key: "service",
         align: "center",
         render: data => (
-          <WrapLink path={`/message-reply_${data.id}`}>设置</WrapLink>
+          <WrapLink
+            path={`/message-reply_${data.id}?begin=${
+              moment().isAfter(data.begin_time) ? 1 : 0
+            }`}
+          >
+            设置
+          </WrapLink>
         )
       },
       {

@@ -14,26 +14,13 @@ import moment from 'moment';
 import "moment/locale/zh-cn";
 import { city } from "2-static/city";
 import { Nav } from "0-components";
-
 const FormItem = Form.Item;
-const { RangePicker } = DatePicker;
 
-const range = (start, end) => {
-  const result = [];
-  for (let i = start; i < end; i++) {
-    result.push(i);
-  }
-  return result;
-};
 class BaseInfoSet extends Component {
   state = {
     siteName: [],
     area: []
   };
-  // 城市选择
-  componentDidMount(){
-    console.log(moment()>moment("2018-7-27 17:51:00"))
-  }
   citOnChange = (arr, value) => {
     const { siteName, area } = this.state;
     const newdata = arr.join(" ");
@@ -78,7 +65,6 @@ class BaseInfoSet extends Component {
   };
   // 存储时间
   saveTime = (time, type) => {
-    console.log(time);
     if (type === 1) {
       this.setState(() => ({
         begin_time: time
@@ -103,11 +89,16 @@ class BaseInfoSet extends Component {
   };
   // 验证结束时间
   disabledDate = current => {
-    const { form } = this.props;
-    return (
-      current && current < moment().endOf('day') && current<form.getFieldValue("begin_time")
-    );
+    const {begin_time}=this.state
+    return current < moment(begin_time).endOf('day') || current < moment()
   };
+  endTime=(rule,value,callback)=>{
+      const {begin_time}=this.state
+      if(moment(value).isBefore(begin_time)){
+        callback("结束时间应该在开始时间之后")
+      }
+      callback()
+  }
   render() {
     const { siteName, submit } = this.state;
     const { getFieldDecorator, getFieldValue } = this.props.form;
@@ -115,7 +106,6 @@ class BaseInfoSet extends Component {
       labelCol: { span: 10 },
       wrapperCol: { span: 14 }
     };
-
     return (
       <div>
         <Nav submit={submit} />
@@ -127,19 +117,22 @@ class BaseInfoSet extends Component {
               })(
                 <DatePicker
                   onChange={(v, time) => this.saveTime(time, 1)}
-                  format="YYYY-MM-DD"
+                  format="YYYY-MM-DD HH:mm:ss"
+                  showTime
+                  showToday
                   placeholder="活动开始时间"
                 />
               )}
             </FormItem>
             <FormItem {...formItemLayout} label="活动结束时间">
               {getFieldDecorator("end_time", {
-                rules: [{ required: true, message: "请选择活动结束时间" }]
+                rules: [{ required: true, message: "请选择活动结束时间"},{validator: this.endTime}]
               })(
                 <DatePicker
                   onChange={(v, time) => this.saveTime(time, 2)}
-                  format="YYYY-MM-DD"
-                  showToday={false}
+                  format="YYYY-MM-DD HH:mm:ss"
+                  showTime
+                  showToday
                   placeholder="活动结束时间"
                   disabled={!getFieldValue("begin_time")}
                   disabledDate={this.disabledDate}

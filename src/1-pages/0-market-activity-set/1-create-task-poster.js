@@ -58,7 +58,6 @@ class Home extends Component {
       submit
     } = this.state;
     const { history } = this.props;
-    console.log(image);
     if (submit) {
       message.info("请不要重复提交", 2);
       return;
