@@ -15,8 +15,18 @@ class Home extends Component {
   };
   componentDidMount() {
     this.getDate();
+    Window.addEventListener("resize", ()=>{
+      this.setState(()=>({
+        winWidth:document.body.clientWidth
+      }))
+    },false)
   }
+  componentWillUnmount() {
+    Window.removeEventListener("resize", this.btnMove);
+  }
+  getWidth=()=>{
 
+  }
   changeStu = data => {
     const { page } = this.state;
     const { title, id, state } = data;
@@ -195,7 +205,7 @@ class Home extends Component {
         key: "task",
         align: "center",
         render: data => (
-          <div>
+          <div className="flex jc-around">
             <WrapLink
               className="pr5"
               path={`first-task-ok_${data.id}?begin=${
@@ -223,7 +233,7 @@ class Home extends Component {
         )
       },
       {
-        title: "客服消息恢复",
+        title: "客服消息回复",
         key: "service",
         align: "center",
         render: data => (
@@ -281,7 +291,7 @@ class Home extends Component {
             onSearch={this.onSearch}
           />
           <div className="font16 pl20">
-            当前共有<span className="c-main">{total||0}</span>个营销活动
+            当前共有<span className="c-main">{total || 0}</span>个营销活动
           </div>
         </div>
         <Table
@@ -292,8 +302,10 @@ class Home extends Component {
             onChange: page => {
               this.getDate(page);
             },
-            total
+            total,
+            size: "default "
           }}
+          scroll={{  x:1100  }}
           columns={columns}
           dataSource={data}
           bordered

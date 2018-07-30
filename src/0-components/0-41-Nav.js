@@ -50,7 +50,7 @@ class CommonLayout extends Component {
   handleClick = e => {
     const { location } = this.props;
     const { id } = this.props.match.params;
-    const { begin } = searchToObj(decodeURIComponent(window.location.hash));
+    const { begin } = searchToObj(window.location.hash);
     const { submit, poster_id } = this.props;
     if (!id && !poster_id) {
       message.error("你还未创建海报", 2);
