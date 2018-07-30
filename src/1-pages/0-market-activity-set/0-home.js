@@ -198,7 +198,7 @@ class Home extends Component {
           <div>
             <WrapLink
               className="pr5"
-              path={`member-join-tip_${data.id}?begin=${
+              path={`first-task-ok_${data.id}?begin=${
                 moment().isAfter(data.begin_time) ? 1 : 0
               }`}
             >
@@ -206,14 +206,14 @@ class Home extends Component {
             </WrapLink>
             <WrapLink
               className="pr5"
-              path={`member-join-tip_${data.id}?begin=${
+              path={`second-task-ok_${data.id}?begin=${
                 moment().isAfter(data.begin_time) ? 1 : 0
               }`}
             >
               二阶任务
             </WrapLink>
             <WrapLink
-              path={`member-join-tip_${data.id}?begin=${
+              path={`third-task-ok_${data.id}?begin=${
                 moment().isAfter(data.begin_time) ? 1 : 0
               }`}
             >
