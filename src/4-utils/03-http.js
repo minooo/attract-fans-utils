@@ -11,6 +11,9 @@ import { message } from "antd";
 //   console.info(error.response, 'asd')
 // });
 // axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
+const { origin, pathname } = window.location
+const dev = process.env.NODE_ENV !== "production"
+const apiUrl = origin + pathname
 
 const callApi = (url, method, data, options = {}) => {
   const opts = { ...options };
@@ -18,7 +21,7 @@ const callApi = (url, method, data, options = {}) => {
     Object.assign(
       {},
       {
-        baseURL: "/L15aP8O79DN1QVyKRbpd/",
+        baseURL: dev ? "/L15aP8O79DN1QVyKRbpd/" : apiUrl,
         url,
         method,
         params: method === "get" ? data : {}, // 添加在请求URL后面的参数
