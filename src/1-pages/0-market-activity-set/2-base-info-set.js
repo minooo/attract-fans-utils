@@ -105,7 +105,7 @@ class BaseInfoSet extends Component {
   disabledDate = current => {
     const { form } = this.props;
     return (
-      current && current < moment().endOf('day')
+      current && current < moment().endOf('day') && current<form.getFieldValue("begin_time")
     );
   };
   render() {
@@ -127,8 +127,7 @@ class BaseInfoSet extends Component {
               })(
                 <DatePicker
                   onChange={(v, time) => this.saveTime(time, 1)}
-                  format="YYYY-MM-DD HH:mm:ss"
-                  showTime
+                  format="YYYY-MM-DD"
                   placeholder="活动开始时间"
                 />
               )}
@@ -139,8 +138,7 @@ class BaseInfoSet extends Component {
               })(
                 <DatePicker
                   onChange={(v, time) => this.saveTime(time, 2)}
-                  format="YYYY-MM-DD HH:mm:ss"
-                  showTime
+                  format="YYYY-MM-DD"
                   showToday={false}
                   placeholder="活动结束时间"
                   disabled={!getFieldValue("begin_time")}
