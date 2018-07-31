@@ -24,7 +24,6 @@ class CommonLayout extends Component {
     super(props);
     const { location } = this.props;
     const arr = keysArr(location.pathname);
-    console.log(arr[0], "进去页面执行");
     this.state = {
       handleOpenKeys: arr[0]
     };
