@@ -212,7 +212,7 @@ class Member extends Component {
           </FormItem>
           <FormItem {...formItemLayout} label="奖励链接">
             {getFieldDecorator("link", {
-              initialValue: result && result.content && result.link
+              initialValue: result && result.link
             })(<Input placeholder="请输入一阶任务完成奖励链接" />)}
           </FormItem>
           <FormItem
