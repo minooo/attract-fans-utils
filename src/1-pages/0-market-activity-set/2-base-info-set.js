@@ -9,24 +9,68 @@ import {
   Tag,
   message
 } from "antd";
-import { http } from "4-utils";
+import { http, common } from "4-utils";
 import moment from "moment";
 import "moment/locale/zh-cn";
 import { city } from "2-static/city";
-import { Nav } from "0-components";
+import { Nav, LoadingFetch } from "0-components";
+
 const FormItem = Form.Item;
+const { searchToObj } = common;
 
 class BaseInfoSet extends Component {
   state = {
     siteName: [],
-    area: []
+    area: [],
+    show: false
   };
-  citOnChange = (arr, value) => {
+  componentDidMount() {
+    const { begin } = searchToObj(window.location.hash);
+    const { id } = this.props.match.params;
+    if (id && begin) {
+      this.setState(() => ({
+        show: true
+      }));
+      http
+        .get("", {
+          action: "baseSetting",
+          poster_id: id
+        })
+        .then(res => {
+          if (res.errcode === 0) {
+            const { setting, areas } = res.base_setting;
+            this.backCity(areas);
+            this.setState(() => ({
+              setting,
+              show: false
+            }));
+          } else {
+            this.setState(
+              () => ({
+                show: false
+              }),
+              () => message.error(res.msg)
+            );
+          }
+        })
+        .catch(err => {
+          this.setState(
+            () => ({ show: false }),
+            () => message.error("网络出错，请稍后再试！")
+          );
+        });
+    }
+  }
+  backCity = area => {
+    const cityName = area.map(v => `${v.province} ${v.city}`);
+    this.setState(() => ({ siteName: cityName, area }));
+  };
+  citOnChange = arr => {
     const { siteName, area } = this.state;
     const newdata = arr.join(" ");
     const siteId = {
-      province_id: value[0].id,
-      city_id: value[1].id
+      province: arr[0],
+      city: arr[1]
     };
     if (!siteName.includes(newdata) && !area.includes(siteId)) {
       this.setState(pre => ({
@@ -46,6 +90,10 @@ class BaseInfoSet extends Component {
     }
     this.props.form.validateFieldsAndScroll((err, values) => {
       if (!err) {
+        if (moment(end_time).isBefore(moment(begin_time))) {
+          message.error("结束时间应该在开始时间之后", 2);
+          return;
+        }
         const { task1_num, task2_num, task3_num, stock, is_stock } = values;
         const param = {
           action: "baseSetting",
@@ -102,6 +150,15 @@ class BaseInfoSet extends Component {
     const { begin_time } = this.state;
     return current < moment(begin_time).endOf("day") || current < moment();
   };
+  // 验证开始时间
+  beginTime = (rule, value, callback) => {
+    const { end_time } = this.state;
+    if (end_time && moment(value).isAfter(end_time)) {
+      callback("开始时间应该结束时间在之前");
+    }
+    callback();
+  };
+  // 验证结束时间
   endTime = (rule, value, callback) => {
     const { begin_time } = this.state;
     if (moment(value).isBefore(begin_time)) {
@@ -110,7 +167,7 @@ class BaseInfoSet extends Component {
     callback();
   };
   render() {
-    const { siteName, submit, poster_begin } = this.state;
+    const { siteName, submit, poster_begin, show, setting } = this.state;
     const { getFieldDecorator, getFieldValue } = this.props.form;
     const formItemLayout = {
       labelCol: { span: 10 },
@@ -119,11 +176,17 @@ class BaseInfoSet extends Component {
     return (
       <div>
         <Nav submit={submit} poster_begin={poster_begin} />
+        {show && <LoadingFetch />}
         <div className="mt30 plr25 border-default">
           <Form style={{ paddingTop: "40px" }} onSubmit={this.handleSubmit}>
             <FormItem {...formItemLayout} label="活动开始时间">
               {getFieldDecorator("begin_time", {
-                rules: [{ required: true, message: "请选择活动开始时间" }]
+                initialValue:
+                  setting && setting.begin_time && moment(setting.begin_time),
+                rules: [
+                  { required: true, message: "请选择活动开始时间" },
+                  { validator: this.beginTime }
+                ]
               })(
                 <DatePicker
                   onChange={(v, time) => this.saveTime(time, 1)}
@@ -136,6 +199,8 @@ class BaseInfoSet extends Component {
             </FormItem>
             <FormItem {...formItemLayout} label="活动结束时间">
               {getFieldDecorator("end_time", {
+                initialValue:
+                  setting && setting.end_time && moment(setting.end_time),
                 rules: [
                   { required: true, message: "请选择活动结束时间" },
                   { validator: this.endTime }
@@ -160,6 +225,7 @@ class BaseInfoSet extends Component {
                 <FormItem {...formItemLayout}>
                   <span className="ant-input-group-addon">一阶邀请</span>
                   {getFieldDecorator("task1_num", {
+                    initialValue: setting && setting.task1_num,
                     rules: [
                       {
                         required: true,
@@ -172,6 +238,7 @@ class BaseInfoSet extends Component {
                 <FormItem {...formItemLayout}>
                   <span className="ant-input-group-addon">二阶邀请</span>
                   {getFieldDecorator("task2_num", {
+                    initialValue: setting && setting.task2_num,
                     rules: [
                       {
                         required: true,
@@ -184,6 +251,7 @@ class BaseInfoSet extends Component {
                 <FormItem {...formItemLayout} label="">
                   <span className="ant-input-group-addon">三阶邀请</span>
                   {getFieldDecorator("task3_num", {
+                    initialValue: setting && setting.task3_num,
                     rules: [
                       {
                         required: true,
@@ -226,6 +294,7 @@ class BaseInfoSet extends Component {
             </div>
             <FormItem {...formItemLayout} label="活动奖品库存">
               {getFieldDecorator("stock", {
+                initialValue: setting && setting.stock,
                 rules: [
                   {
                     required: true,
@@ -239,7 +308,11 @@ class BaseInfoSet extends Component {
               </div>
             </FormItem>
             <FormItem {...formItemLayout} label="取消扣除人气">
-              {getFieldDecorator("is_stock")(<Switch />)}
+              {getFieldDecorator("is_stock", {
+                valuePropName: "checked",
+                initialValue:
+                  setting && setting.is_stock && setting.is_stock === 1
+              })(<Switch />)}
               <div className="c666 font12">
                 说明：开启后，取关扣除人气值，重新扫码只算一次助力，能有效避免粉丝取消关注。
               </div>

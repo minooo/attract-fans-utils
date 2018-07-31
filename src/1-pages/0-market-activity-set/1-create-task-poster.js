@@ -39,7 +39,8 @@ class Home extends Component {
     const { value } = e.target;
     if (value === 1) {
       this.setState(() => ({
-        wxType: value
+        wxType: value,
+        qrcode: null
       }));
     } else {
       this.setState(() => ({
@@ -337,10 +338,10 @@ class Home extends Component {
               {/*3.1 海报预览 */}
               <div className="flex equal">
                 <div
-                  className="plr20 ptb20 border-default mr20"
-                  style={{ width: "320px", minHeight: "540px" }}
+                  className="plr20 pt20 border-default mr20"
+                  style={{ width: "320px", height: "540px" }}
                 >
-                  <img style={{ height: "470px" }} src={posterUrl} alt="" />
+                  <img style={{ width: "280px" }} src={posterUrl} alt="" />
                 </div>
                 {/*3.2 海报上传 */}
                 <div className="plr20 ptb20 border-default equal">
@@ -358,7 +359,6 @@ class Home extends Component {
                       rules: [{ required: true, message: "请上传图片" }]
                     })(
                       <Upload
-                        action="http://mp.dev.duduapp.net/h5backend/L15aP8O79DN1QVyKRbpd?_api=upload"
                         listType="picture"
                         customRequest={data => this.customRequest(data, 1)}
                         showUploadList={false}
@@ -406,7 +406,6 @@ class Home extends Component {
                           rules: [{ required: true, message: "请上传二维码" }]
                         })(
                           <Upload
-                            action="http://mp.dev.duduapp.net/upload/image"
                             listType="picture"
                             showUploadList={false}
                             disabled={ercodeLoading}

@@ -11,12 +11,21 @@ const { Search } = Input;
 class Home extends Component {
   state = {
     show: false,
-    page: 1
+    page: 1,
+    winWidth: document.body.clientWidth
   };
   componentDidMount() {
+    window.addEventListener("resize", this.getWidth ,false)
     this.getDate();
   }
-
+  componentWillUnmount() {
+    window.removeEventListener("resize", this.getWidth);
+  }
+  getWidth=()=>{
+    this.setState(()=>({
+      winWidth:document.body.clientWidth
+    }))
+  }
   changeStu = data => {
     const { page } = this.state;
     const { title, id, state } = data;
@@ -136,7 +145,7 @@ class Home extends Component {
     }
   };
   render() {
-    const { show, data, total, per_page, page } = this.state;
+    const { show, data, total, per_page, page, winWidth } = this.state;
     const columns = [
       {
         title: "任务名称",
@@ -195,7 +204,7 @@ class Home extends Component {
         key: "task",
         align: "center",
         render: data => (
-          <div>
+          <div className="flex jc-around">
             <WrapLink
               className="pr5"
               path={`first-task-ok_${data.id}?begin=${
@@ -223,7 +232,7 @@ class Home extends Component {
         )
       },
       {
-        title: "客服消息恢复",
+        title: "客服消息回复",
         key: "service",
         align: "center",
         render: data => (
@@ -281,7 +290,7 @@ class Home extends Component {
             onSearch={this.onSearch}
           />
           <div className="font16 pl20">
-            当前共有<span className="c-main">{total||0}</span>个营销活动
+            当前共有<span className="c-main">{total || 0}</span>个营销活动
           </div>
         </div>
         <Table
@@ -292,8 +301,10 @@ class Home extends Component {
             onChange: page => {
               this.getDate(page);
             },
-            total
+            total,
+            size: "default "
           }}
+          scroll={{ x: winWidth < 1500 ? 1200 : 0 }}
           columns={columns}
           dataSource={data}
           bordered
