@@ -169,7 +169,7 @@ class Member extends Component {
           </FormItem>
           <FormItem {...formItemLayout} label="头部">
             {getFieldDecorator("first", {
-              initialValue: result && result.content.first,
+              initialValue: result && result.content && result.content.first,
               rules: [
                 {
                   required: true,
@@ -195,7 +195,7 @@ class Member extends Component {
           </FormItem>
           <FormItem {...formItemLayout} label="尾部">
             {getFieldDecorator("remark", {
-              initialValue: result && result.content.remark,
+              initialValue: result && result.content && result.content.remark,
               rules: [
                 {
                   required: true,
@@ -212,7 +212,7 @@ class Member extends Component {
           </FormItem>
           <FormItem {...formItemLayout} label="奖励链接">
             {getFieldDecorator("link", {
-              initialValue: result && result.link
+              initialValue: result && result.content && result.link
             })(<Input placeholder="请输入二阶任务完成奖励链接" />)}
           </FormItem>
           <FormItem
