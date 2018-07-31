@@ -104,10 +104,18 @@ class CommonLayout extends Component {
       .filter(x => x);
     return key;
   };
+  // 路由筛选
+  selceRouter=path=>{
+    const { location } = this.props;
+    return  location.pathname.includes(path)
+  }
   render() {
     // 当前的key值
-    const { location } = this.props;
-    setTitle(config.find(n => location.pathname.includes(n.path)).text);
+    setTitle(
+      this.selceRouter("create-task-poster")
+        ? "创建任务海报"
+        : config.find(n => this.selceRouter(n.path)).text
+    );
     const Current = this.presentKey();
     return (
       <div>

@@ -67,7 +67,6 @@ class BaseInfoSet extends Component {
   };
   citOnChange = arr => {
     const { siteName, area } = this.state;
-    console.log(arr);
     const newdata = arr.join(" ");
     const siteId = {
       province: arr[0],
