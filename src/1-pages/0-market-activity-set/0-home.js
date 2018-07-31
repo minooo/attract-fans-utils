@@ -251,18 +251,12 @@ class Home extends Component {
         key: "stats",
         align: "center",
         render: data => (
-          <WrapLink path={`/8-ab-test__${data.id}`}>查看</WrapLink>
+          <WrapLink path="/users-analyze">查看</WrapLink>
         )
       }
     ];
     return (
       <div>
-        <WrapLink
-              className="pr5"
-              path="/task-ok-analyze"
-            >
-              asdf
-            </WrapLink>
         {show && <LoadingFetch />}
         <div
           className="h60 font18 pl10 flex r4 ai-center jc-between"
