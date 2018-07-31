@@ -158,7 +158,7 @@ class Member extends Component {
             extra="微信公众号后台-模板消息-成员加入提醒-模板ID"
           >
             {getFieldDecorator("templete_id", {
-              initialValue: result && result.templete_id,
+              initialValue: result && result.content && result.templete_id,
               rules: [
                 {
                   required: true,
@@ -169,7 +169,7 @@ class Member extends Component {
           </FormItem>
           <FormItem {...formItemLayout} label="头部">
             {getFieldDecorator("first", {
-              initialValue: result && result.content.first,
+              initialValue: result && result.content && result.content.first,
               rules: [
                 {
                   required: true,
@@ -195,7 +195,7 @@ class Member extends Component {
           </FormItem>
           <FormItem {...formItemLayout} label="尾部">
             {getFieldDecorator("remark", {
-              initialValue: result && result.content.remark,
+              initialValue: result && result.content && result.content.remark,
               rules: [
                 {
                   required: true,
@@ -212,7 +212,7 @@ class Member extends Component {
           </FormItem>
           <FormItem {...formItemLayout} label="奖励链接">
             {getFieldDecorator("link", {
-              initialValue: result && result.link
+              initialValue: result  && result.link
             })(<Input placeholder="请输入三阶任务完成奖励链接" />)}
           </FormItem>
           <FormItem
