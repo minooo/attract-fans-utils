@@ -30,15 +30,17 @@ class Message extends Component {
         show: false,
         result: result
       });
-      if(result.task_image){
+      if (result.task_image) {
         this.setState({
-          fileList:[{
-            uid: -1,
-            name: '1.png',
-            status: 'done',
-            url: result.task_image,
-          }]
-        })
+          fileList: [
+            {
+              uid: -1,
+              name: "1.png",
+              status: "done",
+              url: result.task_image
+            }
+          ]
+        });
       }
     } else {
       message.error(msg);
@@ -54,7 +56,9 @@ class Message extends Component {
           const { fileList } = this.state;
           const { follow, task_content, cancel, repeat, poster_end } = values;
           if (fileList.length > 0) {
-            var task_image = fileList[0].response.url;
+            var task_image =
+              (fileList[0].response && fileList[0].response.url) ||
+              fileList[0].url;
           }
           const { id } = this.props.match.params;
           http.postC(
