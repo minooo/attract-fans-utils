@@ -121,18 +121,12 @@ class Member extends Component {
     const keys = getFieldValue("keys");
     const formItems = keys.map((k, index) => {
       return (
-        <Fragment>
-          <FormItem {...formItemLayout} label={`参数 ${k}`} key={k}>
-            {getFieldDecorator(`key[${k}]`, {
-              validateTrigger: ["onChange", "onBlur"]
-            })(
-              <Input
-                placeholder="key"
-                style={{ width: "40%", marginRight: 8 }}
-              />
-            )}
-          </FormItem>
-          <FormItem {...formItemLayout} label={`参数 ${k}`} key={k}>
+        <FormItem {...formItemLayout} label={`参数 ${k}`} key={k}>
+          {getFieldDecorator(`key[${k}]`, {
+            validateTrigger: ["onChange", "onBlur"]
+          })(
+            <Input placeholder="key" style={{ width: "40%", marginRight: 8 }} />
+          )}
           {getFieldDecorator(`valu[${k}]`, {
             validateTrigger: ["onChange", "onBlur"]
           })(
@@ -150,7 +144,6 @@ class Member extends Component {
             />
           ) : null}
         </FormItem>
-        </Fragment>
       );
     });
     return (
