@@ -38,7 +38,8 @@ class BaseInfoSet extends Component {
         })
         .then(res => {
           if (res.errcode === 0) {
-            const { setting } = res.base_setting;
+            const { setting, areas } = res.base_setting;
+            this.backCity(areas);
             this.setState(() => ({
               setting,
               show: false
@@ -60,12 +61,17 @@ class BaseInfoSet extends Component {
         });
     }
   }
-  citOnChange = (arr, value) => {
+  backCity = area => {
+    const cityName = area.map(v => `${v.province} ${v.city}`);
+    this.setState(() => ({ siteName: cityName, area }));
+  };
+  citOnChange = arr => {
     const { siteName, area } = this.state;
+    console.log(arr);
     const newdata = arr.join(" ");
     const siteId = {
-      province_id: value[0].id,
-      city_id: value[1].id
+      province: arr[0],
+      city: arr[1]
     };
     if (!siteName.includes(newdata) && !area.includes(siteId)) {
       this.setState(pre => ({
