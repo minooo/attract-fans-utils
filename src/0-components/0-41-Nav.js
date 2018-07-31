@@ -3,8 +3,7 @@ import { Menu, Modal, message } from "antd";
 import { withRouter } from "react-router-dom";
 import { observer, inject } from "mobx-react";
 import { common } from "4-utils";
-
-const { searchToObj } = common;
+const { searchToObj, setTitle } = common;
 const config = [
   {
     text: "基本信息设置",
@@ -60,11 +59,9 @@ class CommonLayout extends Component {
       !begin
     ) {
       message.error("请先提交基本设置信息", 2);
-    }
-    else if(parseInt(begin, 10) === 1 && parseInt(e.key, 10) === 0){
+    } else if (parseInt(begin, 10) === 1 && parseInt(e.key, 10) === 0) {
       message.error("活动开始不能修改基本信息", 3);
-    }
-    else if (!submit) {
+    } else if (!submit) {
       this.setState({
         visible: true,
         key: e.key
@@ -82,14 +79,16 @@ class CommonLayout extends Component {
   routerLink = () => {
     const { history, poster_id, poster_begin } = this.props;
     const { id } = this.props.match.params;
-    const  begin  = searchToObj(decodeURIComponent(window.location.hash)).begin || poster_begin;
+    const begin =
+      searchToObj(decodeURIComponent(window.location.hash)).begin ||
+      poster_begin;
     const { key } = this.state;
-      this.setState({
-        visible: false
-      });
-      const paramId = id || poster_id;
-      const path = config[parseInt(key, 10)].path;
-      history.push(`${path}_${paramId}?begin=${begin}`);
+    this.setState({
+      visible: false
+    });
+    const paramId = id || poster_id;
+    const path = config[parseInt(key, 10)].path;
+    history.push(`${path}_${paramId}?begin=${begin}`);
   };
 
   // 筛选当前的key
@@ -107,6 +106,8 @@ class CommonLayout extends Component {
   };
   render() {
     // 当前的key值
+    const { location } = this.props;
+    setTitle(config.find(n => location.pathname.includes(n.path)).text);
     const Current = this.presentKey();
     return (
       <div>

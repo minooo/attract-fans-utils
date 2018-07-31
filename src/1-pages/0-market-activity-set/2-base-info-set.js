@@ -15,7 +15,6 @@ import "moment/locale/zh-cn";
 import { city } from "2-static/city";
 import { Nav, LoadingFetch } from "0-components";
 
-
 const FormItem = Form.Item;
 const { searchToObj } = common;
 
@@ -26,7 +25,7 @@ class BaseInfoSet extends Component {
     show: false
   };
   componentDidMount() {
-    const { begin } = searchToObj(window.location.hash)
+    const { begin } = searchToObj(window.location.hash);
     const { id } = this.props.match.params;
     if (id && begin) {
       this.setState(() => ({
@@ -42,7 +41,6 @@ class BaseInfoSet extends Component {
             const { setting } = res.base_setting;
             this.setState(() => ({
               setting,
-              submit: true,
               show: false
             }));
           } else {
@@ -89,15 +87,9 @@ class BaseInfoSet extends Component {
       if (!err) {
         if (moment(end_time).isBefore(moment(begin_time))) {
           message.error("结束时间应该在开始时间之后", 2);
-          return
+          return;
         }
-        const {
-          task1_num,
-          task2_num,
-          task3_num,
-          stock,
-          is_stock,
-        } = values;
+        const { task1_num, task2_num, task3_num, stock, is_stock } = values;
         const param = {
           action: "baseSetting",
           poster_id: id,
@@ -126,7 +118,6 @@ class BaseInfoSet extends Component {
   };
   // 存储时间
   saveTime = (time, type) => {
-    console.log(time)
     if (type === 1) {
       this.setState(() => ({
         begin_time: time
@@ -154,6 +145,15 @@ class BaseInfoSet extends Component {
     const { begin_time } = this.state;
     return current < moment(begin_time).endOf("day") || current < moment();
   };
+  // 验证开始时间
+  beginTime = (rule, value, callback) => {
+    const { end_time } = this.state;
+    if (end_time && moment(value).isAfter(end_time)) {
+      callback("开始时间应该结束时间在之前");
+    }
+    callback();
+  };
+  // 验证结束时间
   endTime = (rule, value, callback) => {
     const { begin_time } = this.state;
     if (moment(value).isBefore(begin_time)) {
@@ -176,8 +176,12 @@ class BaseInfoSet extends Component {
           <Form style={{ paddingTop: "40px" }} onSubmit={this.handleSubmit}>
             <FormItem {...formItemLayout} label="活动开始时间">
               {getFieldDecorator("begin_time", {
-                initialValue: setting && setting.begin_time && moment(setting.begin_time),
-                rules: [{ required: true, message: "请选择活动开始时间" }]
+                initialValue:
+                  setting && setting.begin_time && moment(setting.begin_time),
+                rules: [
+                  { required: true, message: "请选择活动开始时间" },
+                  { validator: this.beginTime }
+                ]
               })(
                 <DatePicker
                   onChange={(v, time) => this.saveTime(time, 1)}
@@ -190,7 +194,8 @@ class BaseInfoSet extends Component {
             </FormItem>
             <FormItem {...formItemLayout} label="活动结束时间">
               {getFieldDecorator("end_time", {
-                initialValue: setting && setting.end_time && moment(setting.end_time),
+                initialValue:
+                  setting && setting.end_time && moment(setting.end_time),
                 rules: [
                   { required: true, message: "请选择活动结束时间" },
                   { validator: this.endTime }
@@ -214,50 +219,41 @@ class BaseInfoSet extends Component {
               <div className="equal">
                 <FormItem {...formItemLayout}>
                   <span className="ant-input-group-addon">一阶邀请</span>
-                  {getFieldDecorator(
-                    "task1_num",
-                    {
-                      initialValue: setting && setting.task1_num,
-                      rules: [
-                        {
-                          required: true,
-                          message: "请填写一阶邀请任务人数"
-                        }
-                      ]
-                    }
-                  )(<InputNumber min={0} />)}
+                  {getFieldDecorator("task1_num", {
+                    initialValue: setting && setting.task1_num,
+                    rules: [
+                      {
+                        required: true,
+                        message: "请填写一阶邀请任务人数"
+                      }
+                    ]
+                  })(<InputNumber min={0} />)}
                   <span className="ant-input-group-addon">人关注领取奖励</span>
                 </FormItem>
                 <FormItem {...formItemLayout}>
                   <span className="ant-input-group-addon">二阶邀请</span>
-                  {getFieldDecorator(
-                    "task2_num",
-                    {
-                      initialValue: setting && setting.task2_num,
-                      rules: [
-                        {
-                          required: true,
-                          message: "请填写二阶邀请任务人数"
-                        }
-                      ]
-                    }
-                  )(<InputNumber min={0} />)}
+                  {getFieldDecorator("task2_num", {
+                    initialValue: setting && setting.task2_num,
+                    rules: [
+                      {
+                        required: true,
+                        message: "请填写二阶邀请任务人数"
+                      }
+                    ]
+                  })(<InputNumber min={0} />)}
                   <span className="ant-input-group-addon">人关注领取奖励</span>
                 </FormItem>
                 <FormItem {...formItemLayout} label="">
                   <span className="ant-input-group-addon">三阶邀请</span>
-                  {getFieldDecorator(
-                    "task3_num",
-                    {
-                      initialValue: setting && setting.task3_num,
-                      rules: [
-                        {
-                          required: true,
-                          message: "请填写三阶邀请任务人数"
-                        }
-                      ]
-                    }
-                  )(<InputNumber min={0} />)}
+                  {getFieldDecorator("task3_num", {
+                    initialValue: setting && setting.task3_num,
+                    rules: [
+                      {
+                        required: true,
+                        message: "请填写三阶邀请任务人数"
+                      }
+                    ]
+                  })(<InputNumber min={0} />)}
                   <span className="ant-input-group-addon">人关注领取奖励</span>
                 </FormItem>
               </div>
@@ -292,25 +288,26 @@ class BaseInfoSet extends Component {
               </div>
             </div>
             <FormItem {...formItemLayout} label="活动奖品库存">
-              {getFieldDecorator(
-                "stock",
-                {
-                  initialValue: setting && setting.stock,
-                  rules: [
-                    {
-                      required: true,
-                      message: "请填写库存"
-                    }
-                  ]
-                }
-              )(<InputNumber min={0} />)}
+              {getFieldDecorator("stock", {
+                initialValue: setting && setting.stock,
+                rules: [
+                  {
+                    required: true,
+                    message: "请填写库存"
+                  }
+                ]
+              })(<InputNumber min={0} />)}
               <div className="c666 font12">
                 说明：库存设置为0，则表示不限制库存；
                 库存减少到0时，系统自动终止活动。
               </div>
             </FormItem>
             <FormItem {...formItemLayout} label="取消扣除人气">
-              {getFieldDecorator("is_stock")(<Switch />)}
+              {getFieldDecorator("is_stock", {
+                valuePropName: "checked",
+                initialValue:
+                  setting && setting.is_stock && setting.is_stock === 1
+              })(<Switch />)}
               <div className="c666 font12">
                 说明：开启后，取关扣除人气值，重新扫码只算一次助力，能有效避免粉丝取消关注。
               </div>

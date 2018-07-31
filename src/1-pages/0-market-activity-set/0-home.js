@@ -264,7 +264,6 @@ class Home extends Component {
         )
       }
     ];
-    console.log(winWidth)
     return (
       <div>
         {show && <LoadingFetch />}
@@ -305,7 +304,7 @@ class Home extends Component {
             total,
             size: "default "
           }}
-          scroll={{ x: winWidth < 1400 ? 1100 : 0 }}
+          scroll={{ x: winWidth < 1500 ? 1200 : 0 }}
           columns={columns}
           dataSource={data}
           bordered
