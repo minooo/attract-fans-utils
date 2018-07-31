@@ -1,20 +1,49 @@
 import React, { Component, Fragment } from "react";
 import { Input, Form, Button, Upload, Icon, Modal, message } from "antd";
 import { http } from "4-utils";
-import { Nav } from "0-components";
+import { Nav, LoadingFetch } from "0-components";
 
 const FormItem = Form.Item;
 const { TextArea } = Input;
 
 class Message extends Component {
   state = {
+    show: false,
     submitting: false,
     previewVisible: false,
     previewImage: "",
     fileList: [],
     submit: false
   };
-  componentDidMount() {}
+  componentDidMount() {
+    this.getData();
+  }
+  getData = async () => {
+    this.setState(() => ({
+      show: true
+    }));
+    const { errcode, msg, result } = await http.get(null, {
+      action: "customSetting"
+    });
+    if (parseInt(errcode, 10) === 0 && msg === "success") {
+      this.setState({
+        show: false,
+        result: result
+      });
+      if(result.task_image){
+        this.setState({
+          fileList:[{
+            uid: -1,
+            name: '1.png',
+            status: 'done',
+            url: result.task_image,
+          }]
+        })
+      }
+    } else {
+      message.error(msg);
+    }
+  };
   handleSubmit = e => {
     e.preventDefault();
     const { form } = this.props;
@@ -24,8 +53,8 @@ class Message extends Component {
         if (!err) {
           const { fileList } = this.state;
           const { follow, task_content, cancel, repeat, poster_end } = values;
-          if(fileList.length > 0){
-            var task_image = fileList[0].response.url
+          if (fileList.length > 0) {
+            var task_image = fileList[0].response.url;
           }
           const { id } = this.props.match.params;
           http.postC(
@@ -41,7 +70,9 @@ class Message extends Component {
               poster_end
             },
             data => {
-              message.success("模板信息设置成功");
+              message.success("客服回复消息设置成功", 2, () => {
+                this.setState({ submit: true });
+              });
             }
           );
         }
@@ -59,6 +90,7 @@ class Message extends Component {
   handleCancel = () => this.setState({ previewVisible: false });
   // 处理上传图片
   handleChange = ({ fileList }) => {
+    console.log(fileList);
     this.setState({ fileList });
   };
 
@@ -86,7 +118,9 @@ class Message extends Component {
       previewVisible,
       previewImage,
       fileList,
-      submit
+      submit,
+      show,
+      result
     } = this.state;
     const uploadButton = (
       <div>
@@ -97,6 +131,7 @@ class Message extends Component {
     return (
       <Fragment>
         <Nav submit={submit} />
+        {show && <LoadingFetch />}
         <Form onSubmit={this.handleSubmit} style={{ marginTop: 8 }}>
           <FormItem
             {...formItemLayout}
@@ -104,6 +139,7 @@ class Message extends Component {
             extra="扫码自动回复"
           >
             {getFieldDecorator("follow", {
+              initialValue: result && result.follow,
               rules: [
                 {
                   required: true,
@@ -124,6 +160,7 @@ class Message extends Component {
             extra="例如：你的好友#昵称#放弃为你助力啦。扣除1个人气值！"
           >
             {getFieldDecorator("cancel", {
+              initialValue: result && result.cancel,
               rules: [
                 {
                   required: true,
@@ -144,6 +181,7 @@ class Message extends Component {
             extra="已关注粉丝重复扫描二维码或扫描他人二维码提示信息"
           >
             {getFieldDecorator("repeat", {
+              initialValue: result && result.repeat,
               rules: [
                 {
                   required: true,
@@ -164,6 +202,7 @@ class Message extends Component {
             extra="活动结束提示语，例如：本地活动已经结束啦，敬请期待下次活动"
           >
             {getFieldDecorator("poster_end", {
+              initialValue: result && result.poster_end,
               rules: [
                 {
                   required: true,
@@ -184,6 +223,7 @@ class Message extends Component {
             extra="粉丝完成任务后进行回复的模板消息"
           >
             {getFieldDecorator("task_content", {
+              initialValue: result && result.task_content,
               rules: [
                 {
                   required: true,

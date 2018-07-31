@@ -9,30 +9,14 @@ const { Header, Sider, Footer } = Layout;
 const { SubMenu } = Menu;
 
 const keysArr = path => {
-  if (path.includes("/create-task-poster")) {
-    return [["0"], ["01"], "创建任务海报"];
-  } else if (path.includes("/base-info-set")) {
-    return [["0"], ["02"], "基本信息设置"];
-  } else if (path.includes("/member-join-tip")) {
-    return [["0"], ["03"], "成员加入提醒"];
-  } else if (path.includes("/first-task-ok")) {
-    return [["0"], ["04"], "一阶任务完成"];
-  } else if (path.includes("/second-task-ok")) {
-    return [["0"], ["05"], "二阶任务完成"];
-  } else if (path.includes("/third-task-ok")) {
-    return [["0"], ["06"], "三阶任务完成"];
-  } else if (path.includes("/message-reply")) {
-    return [["0"], ["07"], "客服消息回复"];
-  } else if (path.includes("/users-analyze")) {
+  if (path.includes("/users-analyze")) {
     return [["1"], ["10"], "用户分析"];
   } else if (path.includes("/task-ok-analyze")) {
     return [["1"], ["11"], "任务完成分析"];
   } else if (path.includes("/prize-disbution")) {
     return [["1"], ["12"], "奖品发放情况"];
-  } else if (path.includes("/shielding-detection")) {
-    return [["2"], ["2"], "预警机制"];
   }
-  return [["0"], ["00"], "首页"];
+  return [["0"], ["0"], "首页"];
 };
 
 class CommonLayout extends Component {
@@ -40,15 +24,22 @@ class CommonLayout extends Component {
     super(props);
     const { location } = this.props;
     const arr = keysArr(location.pathname);
-    // console.log(arr[0], "ciao");
     this.state = {
       handleOpenKeys: arr[0]
     };
   }
+  // 展开二级菜单的事件
   onOpenChange = openKeys => {
-    // console.log(openKeys, "openkey");
+    console.log(openKeys, "展开二级菜单执行的事件");
     this.setState(() => ({ handleOpenKeys: [...openKeys] }));
   };
+  componentDidUpdate(preProps) {
+    const { location } = this.props;
+    if (location.pathname !== preProps.location.pathname) {
+      const arr = keysArr(location.pathname);
+      this.setState(() => ({ handleOpenKeys: arr[0] }));
+    }
+  }
   handleClick = e => {
     const { history } = this.props;
     const key = e.key.slice(0, 1);
@@ -70,10 +61,12 @@ class CommonLayout extends Component {
         console.info("menu click");
     }
   };
+  // 响应执行
   onResponse = collapsed => {
     const { menuCollapsed } = this.props;
     menuCollapsed.setCollapsed(collapsed);
   };
+  // 切换执行
   onToggle = () => {
     const { menuCollapsed } = this.props;
     menuCollapsed.setCollapsed(!menuCollapsed.isCollapsed);
@@ -131,24 +124,6 @@ class CommonLayout extends Component {
                 <Icon type="form" />
                 <span className="nav-text">营销活动设置</span>
               </Menu.Item>
-              {/* <SubMenu
-                key="0"
-                title={
-                  <span>
-                    <Icon type="form" />
-                    <span>营销活动设置</span>
-                  </span>
-                }
-              >
-                <Menu.Item key="00">总览</Menu.Item>
-                <Menu.Item key="01">创建任务海报</Menu.Item>
-                <Menu.Item key="02">基本信息设置</Menu.Item>
-                <Menu.Item key="03">成员加入提醒</Menu.Item>
-                <Menu.Item key="04">一阶任务完成</Menu.Item>
-                <Menu.Item key="05">二阶任务完成</Menu.Item>
-                <Menu.Item key="06">三阶任务完成</Menu.Item>
-                <Menu.Item key="07">客服消息回复</Menu.Item>
-              </SubMenu> */}
               <SubMenu
                 key="1"
                 title={
@@ -162,14 +137,13 @@ class CommonLayout extends Component {
                 <Menu.Item key="11">任务完成分析</Menu.Item>
                 <Menu.Item key="12">奖品发放情况</Menu.Item>
               </SubMenu>
-              <Menu.Item key="2">
-                <Icon type="line-chart" />
-                <span className="nav-text">预警机制</span>
-              </Menu.Item>
             </Menu>
           </Sider>
           <Layout
-            style={{ marginLeft: menuCollapsed.isCollapsed ? 80 : 220, minHeight: "100vh" }}
+            style={{
+              marginLeft: menuCollapsed.isCollapsed ? 80 : 220,
+              minHeight: "100vh"
+            }}
             className="transition-margin flex jc-between"
           >
             <Header

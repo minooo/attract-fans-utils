@@ -260,7 +260,7 @@ class Home extends Component {
         key: "stats",
         align: "center",
         render: data => (
-          <WrapLink path={`/8-ab-test__${data.id}`}>查看</WrapLink>
+          <WrapLink path="/users-analyze">查看</WrapLink>
         )
       }
     ];

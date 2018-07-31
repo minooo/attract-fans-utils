@@ -1,7 +1,7 @@
 import React, { Component, Fragment } from "react";
 import { Input, Form, Button, Icon, message } from "antd";
 import { http } from "4-utils";
-import { Nav } from "0-components";
+import { Nav, LoadingFetch } from "0-components";
 
 const FormItem = Form.Item;
 const { TextArea } = Input;
@@ -9,10 +9,32 @@ let uuid = 1;
 
 class Member extends Component {
   state = {
+    show: false,
     submitting: false,
     submit: false
   };
-  componentDidMount() {}
+  componentDidMount() {
+    const { id } = this.props.match.params;
+    this.getData(id);
+  }
+  getData = async id => {
+    this.setState(() => ({
+      show: true
+    }));
+    const { errcode, msg, result } = await http.get(null, {
+      action: "templete",
+      poster_id: id,
+      type: 2
+    });
+    if (parseInt(errcode, 10) === 0 && msg === "success") {
+      this.setState({
+        show: false,
+        result: result
+      });
+    } else {
+      message.error(msg);
+    }
+  };
   handleSubmit = e => {
     e.preventDefault();
     const { form } = this.props;
@@ -36,10 +58,13 @@ class Member extends Component {
             poster_id: id,
             templete_id: values.templete_id,
             type: 2,
+            link: values.link,
             content
           },
           data => {
-            message.success("模板信息设置成功");
+            message.success("模板信息设置成功", 2, () => {
+              this.setState({ submit: true });
+            });
           }
         );
       }
@@ -92,7 +117,7 @@ class Member extends Component {
       }
     };
     const { getFieldDecorator, getFieldValue } = this.props.form;
-    const { submitting, submit } = this.state;
+    const { submitting, submit, show, result } = this.state;
     getFieldDecorator("keys", { initialValue: [0] });
     const keys = getFieldValue("keys");
     const formItems = keys.map((k, index) => {
@@ -124,6 +149,7 @@ class Member extends Component {
     });
     return (
       <Fragment>
+        {show && <LoadingFetch />}
         <Nav submit={submit} />
         <Form onSubmit={this.handleSubmit} style={{ marginTop: 8 }}>
           <FormItem
@@ -132,6 +158,7 @@ class Member extends Component {
             extra="微信公众号后台-模板消息-成员加入提醒-模板ID"
           >
             {getFieldDecorator("templete_id", {
+              initialValue: result && result.templete_id,
               rules: [
                 {
                   required: true,
@@ -142,6 +169,7 @@ class Member extends Component {
           </FormItem>
           <FormItem {...formItemLayout} label="头部">
             {getFieldDecorator("first", {
+              initialValue: result && result.content.first,
               rules: [
                 {
                   required: true,
@@ -157,13 +185,17 @@ class Member extends Component {
             )}
           </FormItem>
           {formItems}
-          <FormItem {...submitFormLayout} extra="示例：key：{{product.DATA}},value：任务完成人数：#人数# ">
+          <FormItem
+            {...submitFormLayout}
+            extra="示例：key：{{product.DATA}},value：任务完成人数：#人数# "
+          >
             <Button type="dashed" onClick={this.add} style={{ width: "30%" }}>
               <Icon type="plus" /> 添加一条键
             </Button>
           </FormItem>
           <FormItem {...formItemLayout} label="尾部">
             {getFieldDecorator("remark", {
+              initialValue: result && result.content.remark,
               rules: [
                 {
                   required: true,
@@ -177,6 +209,11 @@ class Member extends Component {
                 rows={4}
               />
             )}
+          </FormItem>
+          <FormItem {...formItemLayout} label="奖励链接">
+            {getFieldDecorator("link", {
+              initialValue: result && result.link
+            })(<Input placeholder="请输入二阶任务完成奖励链接" />)}
           </FormItem>
           <FormItem
             {...formItemLayout}
