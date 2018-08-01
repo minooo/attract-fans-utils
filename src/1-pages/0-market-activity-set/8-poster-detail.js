@@ -22,11 +22,15 @@ const { TextArea } = Input;
 const CheckboxGroup = Checkbox.Group;
 class Home extends Component {
   state = {
+    shwo:false,
     PosterOptions: ["头像", "昵称"],
     imgUrl: null
   };
   componentDidMount() {
     const { id } = this.props.match.params;
+    this.setState(() => ({
+      show: true
+    }));
     http
       .get("", {
         action: "poster",
@@ -45,7 +49,7 @@ class Home extends Component {
               image: result.image,
               is_avatar: result.is_avatar,
               is_nickname: result.is_nickname,
-              code_font_color: result.result.code_font_color,
+              code_font_color: result.code_font_color,
               code_font_size: result.code_font_size,
               qrcode: result.qrcode
             },
@@ -84,6 +88,7 @@ class Home extends Component {
     }
     return arr;
   };
+ 
   render() {
     const { getFieldDecorator } = this.props.form;
     const { show, result, PosterOptions, imgUrl } = this.state;

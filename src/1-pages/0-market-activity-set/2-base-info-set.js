@@ -42,7 +42,8 @@ class BaseInfoSet extends Component {
             this.backCity(areas);
             this.setState(() => ({
               setting,
-              show: false
+              show: false,
+              submit:parseInt(begin,10)===1
             }));
           } else {
             this.setState(

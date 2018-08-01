@@ -51,7 +51,7 @@ export default [
     component: MessageReply
   },
   {
-    path: "/8-poster-detail_:id",
+    path: "/poster-detail_:id",
     component: PosterDetail
   }
 ];

@@ -254,7 +254,7 @@ class Home extends Component {
         key: "stats",
         align: "center",
         render: data => (
-          <WrapLink path={`/8-poster-detail_${data.id}`}>查看</WrapLink>
+          <WrapLink path={`/poster-detail_${data.id}`}>查看</WrapLink>
         )
       }
     ];
