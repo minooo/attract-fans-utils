@@ -84,6 +84,11 @@ class BaseInfoSet extends Component {
     e.preventDefault();
     const { id } = this.props.match.params;
     const { begin_time, end_time, area, submit } = this.state;
+    const { begin } = searchToObj(window.location.hash);
+    if (begin && parseInt(begin, 10) === 1) {
+      message.error("活动时间开始后不能进行基本设置", 3);
+      return;
+    }
     if (submit) {
       message.info("请不要重复提交", 2);
       return;
