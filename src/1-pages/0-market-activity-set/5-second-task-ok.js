@@ -27,14 +27,50 @@ class Member extends Component {
       type: 2
     });
     if (parseInt(errcode, 10) === 0 && msg === "success") {
-      this.setState({
-        show: false,
-        result: result
-      });
+      this.setState(
+        () => ({
+          show: false,
+          result: result
+        }),
+        () => {
+          this.setKeyData(result.content);
+        }
+      );
     } else {
       message.error(msg);
     }
   };
+  setKeyData = item => {
+    const keyData = [];
+    for (const name in item) {
+      if (item.hasOwnProperty(name)) {
+        keyData.push(name);
+      }
+    }
+    const key = keyData.filter(x => {
+      if (x === "first" || x === "remark") {
+        return false;
+      } else {
+        return true;
+      }
+    });
+    if(key.length > 0){
+      this.setState({
+        keyData: key
+      });
+      const keyLen = key.length;
+      const { form } = this.props;
+      // 可以使用数据绑定来获取吗
+        uuid = keyLen;
+      // can use data-binding to set
+      // important! notify form to detect changes
+      const nextKeys = this.f(keyLen);
+      form.setFieldsValue({
+        keys: nextKeys
+      });
+    }
+  };
+  f = length => Array.from({ length }).map((v, k) => k);
   handleSubmit = e => {
     e.preventDefault();
     const { form } = this.props;
@@ -117,34 +153,36 @@ class Member extends Component {
       }
     };
     const { getFieldDecorator, getFieldValue } = this.props.form;
-    const { submitting, submit, show, result } = this.state;
+    const { submitting, submit, show, result,keyData } = this.state;
     getFieldDecorator("keys", { initialValue: [0] });
     const keys = getFieldValue("keys");
     const formItems = keys.map((k, index) => {
       return (
-        <FormItem {...formItemLayout} label={`参数 ${k}`} key={k}>
-          {getFieldDecorator(`key[${k}]`, {
-            validateTrigger: ["onChange", "onBlur"]
-          })(
-            <Input placeholder="key" style={{ width: "40%", marginRight: 8 }} />
-          )}
-          {getFieldDecorator(`valu[${k}]`, {
-            validateTrigger: ["onChange", "onBlur"]
-          })(
-            <Input
-              placeholder="value"
-              style={{ width: "40%", marginRight: 8 }}
-            />
-          )}
-          {keys.length > 1 ? (
-            <Icon
-              className="dynamic-delete-button"
-              type="minus-circle-o"
-              disabled={keys.length === 1}
-              onClick={() => this.remove(k)}
-            />
-          ) : null}
-        </FormItem>
+        <FormItem {...formItemLayout} label={`参数 ${index}`} key={k}>
+        {getFieldDecorator(`key[${k}]`, {
+          initialValue: result && result.content && keyData && keyData[index],
+          validateTrigger: ["onChange", "onBlur"]
+        })(
+          <Input placeholder="key" style={{ width: "40%", marginRight: 8 }} />
+        )}
+        {getFieldDecorator(`valu[${k}]`, {
+          initialValue: result && result.content && keyData && result.content[keyData[index]],
+          validateTrigger: ["onChange", "onBlur"]
+        })(
+          <Input
+            placeholder="value"
+            style={{ width: "40%", marginRight: 8 }}
+          />
+        )}
+        {keys.length > 1 ? (
+          <Icon
+            className="dynamic-delete-button"
+            type="minus-circle-o"
+            disabled={keys.length === 1}
+            onClick={() => this.remove(k)}
+          />
+        ) : null}
+      </FormItem>
       );
     });
     return (
@@ -158,7 +196,7 @@ class Member extends Component {
             extra="微信公众号后台-模板消息-成员加入提醒-模板ID"
           >
             {getFieldDecorator("templete_id", {
-              initialValue: result && result.templete_id,
+              initialValue: result  && result.templete_id,
               rules: [
                 {
                   required: true,
@@ -212,8 +250,8 @@ class Member extends Component {
           </FormItem>
           <FormItem {...formItemLayout} label="奖励链接">
             {getFieldDecorator("link", {
-              initialValue: result  && result.link
-            })(<Input placeholder="请输入二阶任务完成奖励链接" />)}
+              initialValue: result && result.link
+            })(<Input placeholder="请输入一阶任务完成奖励链接" />)}
           </FormItem>
           <FormItem
             {...formItemLayout}
