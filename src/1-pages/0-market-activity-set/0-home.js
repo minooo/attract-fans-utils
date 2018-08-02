@@ -15,17 +15,17 @@ class Home extends Component {
     winWidth: document.body.clientWidth
   };
   componentDidMount() {
-    window.addEventListener("resize", this.getWidth ,false)
+    window.addEventListener("resize", this.getWidth, false);
     this.getDate();
   }
   componentWillUnmount() {
     window.removeEventListener("resize", this.getWidth);
   }
-  getWidth=()=>{
-    this.setState(()=>({
-      winWidth:document.body.clientWidth
-    }))
-  }
+  getWidth = () => {
+    this.setState(() => ({
+      winWidth: document.body.clientWidth
+    }));
+  };
   changeStu = data => {
     const { page } = this.state;
     const { title, id, state } = data;
@@ -132,18 +132,7 @@ class Home extends Component {
     }
   };
   // 基本设置
-  basicSet = data => {
-    const { history } = this.props;
-    if (moment().isAfter(data.begin_time)) {
-      message.error("活动时间开始后不能进行基本设置", 3);
-    } else {
-      history.push(
-        `/base-info-set_${data.id}?begin=${
-          moment().isAfter(data.begin_time) ? 1 : 0
-        }`
-      );
-    }
-  };
+
   render() {
     const { show, data, total, per_page, page, winWidth } = this.state;
     const columns = [
@@ -180,7 +169,12 @@ class Home extends Component {
         key: "me",
         align: "center",
         render: data => (
-          <WrapLink className="c-main" onClick={() => this.basicSet(data)}>
+          <WrapLink
+            className="c-main"
+            path={`/base-info-set_${data.id}?begin=${
+              moment().isAfter(data.begin_time) ? 1 : 0
+            }`}
+          >
             设置
           </WrapLink>
         )
@@ -256,11 +250,11 @@ class Home extends Component {
         )
       },
       {
-        title: "数据统计",
+        title: "海报详情",
         key: "stats",
         align: "center",
         render: data => (
-          <WrapLink path="/users-analyze">查看</WrapLink>
+          <WrapLink path={`/poster-detail_${data.id}`}>查看</WrapLink>
         )
       }
     ];

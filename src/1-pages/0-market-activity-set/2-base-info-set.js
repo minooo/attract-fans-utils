@@ -42,7 +42,8 @@ class BaseInfoSet extends Component {
             this.backCity(areas);
             this.setState(() => ({
               setting,
-              show: false
+              show: false,
+              submit:parseInt(begin,10)===1
             }));
           } else {
             this.setState(
@@ -84,6 +85,11 @@ class BaseInfoSet extends Component {
     e.preventDefault();
     const { id } = this.props.match.params;
     const { begin_time, end_time, area, submit } = this.state;
+    const { begin } = searchToObj(window.location.hash);
+    if (begin && parseInt(begin, 10) === 1) {
+      message.error("活动时间开始后不能进行基本设置", 3);
+      return;
+    }
     if (submit) {
       message.info("请不要重复提交", 2);
       return;
@@ -311,7 +317,7 @@ class BaseInfoSet extends Component {
               {getFieldDecorator("is_stock", {
                 valuePropName: "checked",
                 initialValue:
-                  setting && setting.is_stock && setting.is_stock === 1
+                  setting && setting.is_stock === 1
               })(<Switch />)}
               <div className="c666 font12">
                 说明：开启后，取关扣除人气值，重新扫码只算一次助力，能有效避免粉丝取消关注。
