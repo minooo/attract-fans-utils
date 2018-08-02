@@ -43,7 +43,6 @@ class BaseInfoSet extends Component {
             this.setState(() => ({
               setting,
               show: false,
-              submit: parseInt(begin, 10) === 1
             }));
           } else {
             this.setState(
@@ -184,7 +183,7 @@ class BaseInfoSet extends Component {
     };
     return (
       <div>
-        <Nav submit={submit} poster_begin={poster_begin} />
+        <Nav submit={submit} poster_begin={poster_begin} http={setting} />
         {show && <LoadingFetch />}
         <div className="mt30 plr25 border-default">
           <Form style={{ paddingTop: "40px" }} onSubmit={this.handleSubmit}>
