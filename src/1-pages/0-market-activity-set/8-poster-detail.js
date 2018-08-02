@@ -9,7 +9,6 @@ import {
   Upload,
   Button,
   Icon,
-  Switch,
   InputNumber,
   message,
   Tooltip,
@@ -117,7 +116,6 @@ class Detail extends Component {
           code_font_size,
           keyword,
           reply_content,
-          is_auto,
           posterCon
         } = values;
         const param = {
@@ -127,7 +125,6 @@ class Detail extends Component {
           type: result && result.type,
           title,
           image,
-          is_auto: is_auto ? 1 : 0,
           keyword,
           reply_content,
           is_avatar: posterCon.includes("头像") ? 1 : 0,
@@ -283,7 +280,7 @@ class Detail extends Component {
     }));
   };
   render() {
-    const { getFieldDecorator, getFieldValue } = this.props.form;
+    const { getFieldDecorator } = this.props.form;
     const {
       PosterOptions,
       imageLoading,
@@ -563,25 +560,13 @@ class Detail extends Component {
                 </div>
               </div>
             </div>
-            <FormItem
-              style={{ marginTop: "20px" }}
-              {...formItemLayout}
-              label="自动生成海报"
-            >
-              {getFieldDecorator("is_auto", {
-                valuePropName: "checked",
-                initialValue: result && result.is_auto === 1
-              })(<Switch />)}
-              <div className="c666 font12">
-                说明：活动开始时开启，关闭则不会生成海报
-              </div>
-            </FormItem>
-            <FormItem {...formItemLayout} label="海报关键字">
+
+            <FormItem style={{ marginTop: "20px" }} {...formItemLayout} label="海报关键字">
               {getFieldDecorator("keyword", {
                 initialValue: result && result.keyword,
                 rules: [
                   {
-                    required: !!getFieldValue("is_auto"),
+                    required: true,
                     message: "请填写海报关键字"
                   }
                 ]
@@ -600,7 +585,7 @@ class Detail extends Component {
                 initialValue: result && result.reply_content,
                 rules: [
                   {
-                    required: !!getFieldValue("is_auto"),
+                    required: true,
                     message: "请填写生成海报提示"
                   }
                 ]
