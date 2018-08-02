@@ -317,7 +317,7 @@ class BaseInfoSet extends Component {
               {getFieldDecorator("is_stock", {
                 valuePropName: "checked",
                 initialValue:
-                  setting && setting.is_stock && setting.is_stock === 1
+                  setting && setting.is_stock === 1
               })(<Switch />)}
               <div className="c666 font12">
                 说明：开启后，取关扣除人气值，重新扫码只算一次助力，能有效避免粉丝取消关注。
