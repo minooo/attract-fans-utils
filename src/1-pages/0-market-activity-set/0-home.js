@@ -254,7 +254,13 @@ class Home extends Component {
         key: "stats",
         align: "center",
         render: data => (
-          <WrapLink path={`/poster-detail_${data.id}`}>查看</WrapLink>
+          <WrapLink
+            path={`/poster-detail_${data.id}?begin=${
+              moment().isAfter(data.begin_time) ? 1 : 0
+            }`}
+          >
+            查看
+          </WrapLink>
         )
       }
     ];

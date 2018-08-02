@@ -43,7 +43,6 @@ class BaseInfoSet extends Component {
             this.setState(() => ({
               setting,
               show: false,
-              submit:parseInt(begin,10)===1
             }));
           } else {
             this.setState(
@@ -63,6 +62,9 @@ class BaseInfoSet extends Component {
     }
   }
   backCity = area => {
+    if (!area || area.length === 0) {
+      return;
+    }
     const cityName = area.map(v => `${v.province} ${v.city}`);
     this.setState(() => ({ siteName: cityName, area }));
   };
@@ -181,7 +183,7 @@ class BaseInfoSet extends Component {
     };
     return (
       <div>
-        <Nav submit={submit} poster_begin={poster_begin} />
+        <Nav submit={submit} poster_begin={poster_begin} http={setting} />
         {show && <LoadingFetch />}
         <div className="mt30 plr25 border-default">
           <Form style={{ paddingTop: "40px" }} onSubmit={this.handleSubmit}>
@@ -316,8 +318,7 @@ class BaseInfoSet extends Component {
             <FormItem {...formItemLayout} label="取消扣除人气">
               {getFieldDecorator("is_stock", {
                 valuePropName: "checked",
-                initialValue:
-                  setting && setting.is_stock === 1
+                initialValue: setting && setting.is_stock === 1
               })(<Switch />)}
               <div className="c666 font12">
                 说明：开启后，取关扣除人气值，重新扫码只算一次助力，能有效避免粉丝取消关注。

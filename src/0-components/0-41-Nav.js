@@ -50,7 +50,7 @@ class CommonLayout extends Component {
     const { location } = this.props;
     const { id } = this.props.match.params;
     const { begin } = searchToObj(window.location.hash);
-    const { submit, poster_id } = this.props;
+    const { submit, poster_id, http } = this.props;
     if (!id && !poster_id) {
       message.error("你还未创建海报", 2);
     } else if (
@@ -59,7 +59,7 @@ class CommonLayout extends Component {
       !begin
     ) {
       message.error("请先提交基本设置信息", 2);
-    } else if (!submit) {
+    } else if (!submit && !http) {
       this.setState({
         visible: true,
         key: e.key

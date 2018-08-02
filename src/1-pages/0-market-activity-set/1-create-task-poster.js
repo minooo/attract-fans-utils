@@ -10,7 +10,6 @@ import {
   Upload,
   Button,
   Icon,
-  Switch,
   InputNumber,
   message,
   Tooltip,
@@ -80,7 +79,6 @@ class Home extends Component {
           code_font_size,
           keyword,
           reply_content,
-          is_auto
         } = values;
         const param = {
           action: "poster",
@@ -88,7 +86,6 @@ class Home extends Component {
           type: wxType,
           title,
           image,
-          is_auto: is_auto ? 1 : 0,
           keyword,
           reply_content,
           is_avatar: posterCon.includes("头像") ? 1 : 0,
@@ -280,7 +277,7 @@ class Home extends Component {
     }));
   };
   render() {
-    const { getFieldDecorator, getFieldValue } = this.props.form;
+    const { getFieldDecorator } = this.props.form;
     const {
       wxType,
       PosterOptions,
@@ -539,21 +536,11 @@ class Home extends Component {
                 </div>
               </div>
             </div>
-            <FormItem
-              style={{ marginTop: "20px" }}
-              {...formItemLayout}
-              label="自动生成海报"
-            >
-              {getFieldDecorator("is_auto")(<Switch />)}
-              <div className="c666 font12">
-                说明：活动开始时开启，关闭则不会生成海报
-              </div>
-            </FormItem>
-            <FormItem {...formItemLayout} label="海报关键字">
+            <FormItem style={{ marginTop: "20px" }} {...formItemLayout} label="海报关键字">
               {getFieldDecorator("keyword", {
                 rules: [
                   {
-                    required: !!getFieldValue("is_auto"),
+                    required: true,
                     message: "请填写海报关键字"
                   }
                 ]
@@ -571,7 +558,7 @@ class Home extends Component {
               {getFieldDecorator("reply_content", {
                 rules: [
                   {
-                    required: !!getFieldValue("is_auto"),
+                    required: true,
                     message: "请填写生成海报提示"
                   }
                 ]
