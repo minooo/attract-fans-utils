@@ -30,7 +30,7 @@ class Home extends Component {
     ercodeLoading: false,
     poster_id: null,
     isPicker: false,
-    code_font_color: "#333333",
+    code_font_color: "#333333"
   };
   // 当前选中 1.服务号 2.订阅号
   wxChange = e => {
@@ -48,13 +48,7 @@ class Home extends Component {
   };
   handleSubmit = e => {
     e.preventDefault();
-    const {
-      wxType,
-      image,
-      qrcode,
-      code_font_color,
-      submit
-    } = this.state;
+    const { wxType, image, qrcode, code_font_color, submit } = this.state;
     const { history } = this.props;
     if (submit) {
       message.info("请不要重复提交", 2);
@@ -77,7 +71,7 @@ class Home extends Component {
           title,
           code_font_size,
           keyword,
-          reply_content,
+          reply_content
         } = values;
         const param = {
           action: "poster",
@@ -163,10 +157,13 @@ class Home extends Component {
               }
             })
             .catch(err => {
-              this.setState(() => ({
-                ercodeLoading: false,
-                imageLoading: false
-              }),()=>message.error("网络出错，请稍后再试！", 2));
+              this.setState(
+                () => ({
+                  ercodeLoading: false,
+                  imageLoading: false
+                }),
+                () => message.error("网络出错，请稍后再试！", 2)
+              );
             });
         }
       });
@@ -175,7 +172,7 @@ class Home extends Component {
     reader.readAsDataURL(file);
   };
   // 预览图片需要数据
-  getValue = (value) => {
+  getValue = value => {
     this.setState(() => ({
       code_font_color: value.hex
     }));
@@ -203,16 +200,8 @@ class Home extends Component {
   };
   // 预览图片
   onPreview = () => {
-    const {
-      code_font_color,
-      wxType,
-      image,
-      qrcode
-    } = this.state;
-    const {
-      posterCon,
-      code_font_size
-    } = this.props.form.getFieldsValue();
+    const { code_font_color, wxType, image, qrcode } = this.state;
+    const { posterCon, code_font_size } = this.props.form.getFieldsValue();
     if (!image) {
       message.error("请上传海报", 2);
     } else if (wxType === 2 && !qrcode) {
@@ -317,10 +306,8 @@ class Home extends Component {
                 <div className="plr20 ptb20 border-default equal">
                   {/*3.3 选择海报元素 */}
                   <FormItem {...formItemLayoutSamll} label="元素">
-                    {getFieldDecorator("posterCon")(
-                      <CheckboxGroup
-                        options={PosterOptions}
-                      />
+                    {getFieldDecorator("posterCon", { initialValue: [] })(
+                      <CheckboxGroup options={PosterOptions} />
                     )}
                   </FormItem>
                   <FormItem {...formItemLayoutSamll} label="背景">
@@ -504,7 +491,11 @@ class Home extends Component {
                 </div>
               </div>
             </div>
-            <FormItem style={{ marginTop: "20px" }} {...formItemLayout} label="海报关键字">
+            <FormItem
+              style={{ marginTop: "20px" }}
+              {...formItemLayout}
+              label="海报关键字"
+            >
               {getFieldDecorator("keyword", {
                 rules: [
                   {
