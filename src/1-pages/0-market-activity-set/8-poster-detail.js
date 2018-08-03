@@ -82,13 +82,7 @@ class Detail extends Component {
   };
   handleSubmit = e => {
     e.preventDefault();
-    const {
-      result,
-      image,
-      qrcode,
-      code_font_color,
-      submit
-    } = this.state;
+    const { result, image, qrcode, code_font_color, submit } = this.state;
     const { id } = this.props.match.params;
     const { begin } = searchToObj(window.location.hash);
     if (begin && parseInt(begin, 10) === 1) {
@@ -136,9 +130,12 @@ class Detail extends Component {
             ? { ...param }
             : { ...param, code_font_color, code_font_size, qrcode },
           () => {
-            this.setState(() => ({
-              submit: true
-            }),()=>message.success("修改成功", 2));
+            this.setState(
+              () => ({
+                submit: true
+              }),
+              () => message.success("修改成功", 2)
+            );
           }
         );
       }
@@ -211,12 +208,11 @@ class Detail extends Component {
     reader.readAsDataURL(file);
   };
   // 预览图片需要数据
-  getValue = (value) => {
-    // 1.图片内容,2字体尺寸,3字体颜色
-        this.setState(() => ({
-          code_font_color: value.hex
-        }));
-    }
+  getValue = value => {
+    this.setState(() => ({
+      code_font_color: value.hex
+    }));
+  };
   // 删除图片
   removeImg = type => {
     confirm({
@@ -241,30 +237,37 @@ class Detail extends Component {
   // 预览图片
   onPreview = () => {
     const { code_font_color, image, qrcode, result } = this.state;
-    const { getFieldValue } = this.props.form;
+    const {
+      posterCon,
+      code_font_size
+    } = this.props.form.getFieldsValue();
     if (!image) {
       message.error("请上传海报", 2);
     } else if (result && result.type === 2 && !qrcode) {
       message.error("请上传二维码", 2);
     } else if (result && result.type === 2 && !code_font_color) {
       message.error("请填写邀请码字体颜色", 2);
-    } else if (result && result.type === 2 && !getFieldValue("code_font_size")) {
+    } else if (result && result.type === 2 && !code_font_size) {
       message.error("请填写邀请码字体大小", 2);
     } else {
-      //mp.dev.duduapp.net/h5backend/L15aP8O79DN1QVyKRbpd?action=poster&operation=preview&type=2&image=https://file.duduapp.net/image/2018/05/03/f5ef981fce98dc805d7714cd319982c0.gif&is_avatar=1&is_nickname=1&is_qrcode=1&code_font_size=36&code_font_color=FF00FF
       const param = {
         action: "poster",
         operation: "preview",
         type: result && result.type,
         image,
-        is_avatar: getFieldValue("posterCon").includes("头像") ? 1 : 0,
-        is_nickname: getFieldValue("posterCon").includes("昵称") ? 1 : 0
+        is_avatar: posterCon.includes("头像") ? 1 : 0,
+        is_nickname: posterCon.includes("昵称") ? 1 : 0
       };
       http.getC(
         "",
         result && result.type === 1
           ? { ...param }
-          : { ...param, code_font_color, code_font_size: getFieldValue("code_font_size"), qrcode },
+          : {
+              ...param,
+              code_font_color,
+              code_font_size: code_font_size,
+              qrcode
+            },
         ({ url }) => {
           this.setState(() => ({
             posterUrl: url
@@ -306,7 +309,10 @@ class Detail extends Component {
         {show && <LoadingFetch />}
         {/* 表单开始 */}
         <div className="mt30 plr25 border-default flex jc-center">
-          <Form style={{ width: "900px", paddingTop: "40px" }} onSubmit={this.handleSubmit}>
+          <Form
+            style={{ width: "900px", paddingTop: "40px" }}
+            onSubmit={this.handleSubmit}
+          >
             {/*1. 选择公众号类型 */}
             <FormItem {...formItemLayout} label="选择公众号类型">
               {getFieldDecorator("type", {
@@ -354,11 +360,7 @@ class Detail extends Component {
                         result && result.is_avatar,
                         result && result.is_nickname
                       )
-                    })(
-                      <CheckboxGroup
-                        options={PosterOptions}
-                      />
-                    )}
+                    })(<CheckboxGroup options={PosterOptions} />)}
                   </FormItem>
                   <FormItem {...formItemLayoutSamll} label="背景">
                     {getFieldDecorator("image", {})(
@@ -383,11 +385,7 @@ class Detail extends Component {
                       className="relative mb10 ant-col-offset-5"
                       style={{ width: "80px", height: "135px" }}
                     >
-                      <img
-                        className="w-100 h-100"
-                        src={result && result.image}
-                        alt=""
-                      />
+                      <img className="w-100 h-100" src={image} alt="" />
                       <div
                         onClick={() => this.removeImg(1)}
                         className="absolute font20 lh100 common-curson"
@@ -435,11 +433,7 @@ class Detail extends Component {
                             className="relative mb10 ant-col-offset-5"
                             style={{ width: "50px", height: "50px" }}
                           >
-                            <img
-                              className="w-100 h-100"
-                              src={result && result.qrcode}
-                              alt=""
-                            />
+                            <img className="w-100 h-100" src={qrcode} alt="" />
                             <div
                               onClick={() => this.removeImg(2)}
                               className="absolute font20 lh100 common-curson"
@@ -535,9 +529,7 @@ class Detail extends Component {
                                     <SketchPicker
                                       disableAlpha
                                       color={code_font_color}
-                                      onChange={value =>
-                                        this.getValue(value)
-                                      }
+                                      onChange={value => this.getValue(value)}
                                       handleChangeComplete={
                                         this.handleChangeComplete
                                       }
@@ -561,7 +553,11 @@ class Detail extends Component {
               </div>
             </div>
 
-            <FormItem style={{ marginTop: "20px" }} {...formItemLayout} label="海报关键字">
+            <FormItem
+              style={{ marginTop: "20px" }}
+              {...formItemLayout}
+              label="海报关键字"
+            >
               {getFieldDecorator("keyword", {
                 initialValue: result && result.keyword,
                 rules: [
