@@ -94,7 +94,6 @@ class Message extends Component {
   handleCancel = () => this.setState({ previewVisible: false });
   // 处理上传图片
   handleChange = ({ fileList }) => {
-    console.log(fileList);
     this.setState({ fileList });
   };
 
