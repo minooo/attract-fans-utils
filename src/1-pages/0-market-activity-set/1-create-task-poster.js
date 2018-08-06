@@ -30,8 +30,7 @@ class Home extends Component {
     ercodeLoading: false,
     poster_id: null,
     isPicker: false,
-    code_font_color: "#333333",
-    posterCon: []
+    code_font_color: "#333333"
   };
   // 当前选中 1.服务号 2.订阅号
   wxChange = e => {
@@ -49,14 +48,7 @@ class Home extends Component {
   };
   handleSubmit = e => {
     e.preventDefault();
-    const {
-      wxType,
-      image,
-      qrcode,
-      posterCon,
-      code_font_color,
-      submit
-    } = this.state;
+    const { wxType, image, qrcode, code_font_color, submit } = this.state;
     const { history } = this.props;
     if (submit) {
       message.info("请不要重复提交", 2);
@@ -75,10 +67,11 @@ class Home extends Component {
           return;
         }
         const {
+          posterCon,
           title,
           code_font_size,
           keyword,
-          reply_content,
+          reply_content
         } = values;
         const param = {
           action: "poster",
@@ -164,10 +157,13 @@ class Home extends Component {
               }
             })
             .catch(err => {
-              this.setState(() => ({
-                ercodeLoading: false,
-                imageLoading: false
-              }),()=>message.error("网络出错，请稍后再试！", 2));
+              this.setState(
+                () => ({
+                  ercodeLoading: false,
+                  imageLoading: false
+                }),
+                () => message.error("网络出错，请稍后再试！", 2)
+              );
             });
         }
       });
@@ -176,37 +172,10 @@ class Home extends Component {
     reader.readAsDataURL(file);
   };
   // 预览图片需要数据
-  getValue = (value, type) => {
-    // 1.图片内容,2字体尺寸,3字体颜色
-    switch (type) {
-      case 1:
-        this.setState(() => ({
-          posterCon: value
-        }));
-        break;
-      case 2:
-        this.setState(() => ({
-          code_start: value
-        }));
-        break;
-      case 3:
-        this.setState(() => ({
-          code_end: value
-        }));
-        break;
-      case 4:
-        this.setState(() => ({
-          code_font_size: value
-        }));
-        break;
-      case 5:
-        this.setState(() => ({
-          code_font_color: value.hex
-        }));
-        break;
-      default:
-        return;
-    }
+  getValue = value => {
+    this.setState(() => ({
+      code_font_color: value.hex
+    }));
   };
   // 删除图片
   removeImg = type => {
@@ -231,14 +200,8 @@ class Home extends Component {
   };
   // 预览图片
   onPreview = () => {
-    const {
-      code_font_color,
-      code_font_size,
-      wxType,
-      posterCon,
-      image,
-      qrcode
-    } = this.state;
+    const { code_font_color, wxType, image, qrcode } = this.state;
+    const { posterCon, code_font_size } = this.props.form.getFieldsValue();
     if (!image) {
       message.error("请上传海报", 2);
     } else if (wxType === 2 && !qrcode) {
@@ -248,7 +211,6 @@ class Home extends Component {
     } else if (wxType === 2 && !code_font_size) {
       message.error("请填写邀请码字体大小", 2);
     } else {
-      //mp.dev.duduapp.net/h5backend/L15aP8O79DN1QVyKRbpd?action=poster&operation=preview&type=2&image=https://file.duduapp.net/image/2018/05/03/f5ef981fce98dc805d7714cd319982c0.gif&is_avatar=1&is_nickname=1&is_qrcode=1&code_font_size=36&code_font_color=FF00FF
       const param = {
         action: "poster",
         operation: "preview",
@@ -344,11 +306,8 @@ class Home extends Component {
                 <div className="plr20 ptb20 border-default equal">
                   {/*3.3 选择海报元素 */}
                   <FormItem {...formItemLayoutSamll} label="元素">
-                    {getFieldDecorator("posterCon")(
-                      <CheckboxGroup
-                        options={PosterOptions}
-                        onChange={value => this.getValue(value, 1)}
-                      />
+                    {getFieldDecorator("posterCon", { initialValue: [] })(
+                      <CheckboxGroup options={PosterOptions} />
                     )}
                   </FormItem>
                   <FormItem {...formItemLayoutSamll} label="背景">
@@ -360,7 +319,6 @@ class Home extends Component {
                         customRequest={data => this.customRequest(data, 1)}
                         showUploadList={false}
                         disabled={imageLoading}
-                        onChange={this.onChange}
                       >
                         <Button>
                           <Icon
@@ -455,7 +413,6 @@ class Home extends Component {
                               {getFieldDecorator("code_start")(
                                 <InputNumber
                                   disabled
-                                  onChange={value => this.getValue(value, 2)}
                                   placeholder="开始值"
                                   min={0}
                                 />
@@ -467,7 +424,6 @@ class Home extends Component {
                                   min={0}
                                   disabled
                                   placeholder="结束值"
-                                  onChange={value => this.getValue(value, 3)}
                                 />
                               )}
                             </FormItem>
@@ -480,7 +436,6 @@ class Home extends Component {
                                 ]
                               })(
                                 <InputNumber
-                                  onChange={value => this.getValue(value, 4)}
                                   placeholder="字体大小"
                                   max={100}
                                   min={0}
@@ -513,7 +468,7 @@ class Home extends Component {
                                   <SketchPicker
                                     disableAlpha
                                     color={code_font_color}
-                                    onChange={value => this.getValue(value, 5)}
+                                    onChange={value => this.getValue(value)}
                                     handleChangeComplete={
                                       this.handleChangeComplete
                                     }
@@ -536,7 +491,11 @@ class Home extends Component {
                 </div>
               </div>
             </div>
-            <FormItem style={{ marginTop: "20px" }} {...formItemLayout} label="海报关键字">
+            <FormItem
+              style={{ marginTop: "20px" }}
+              {...formItemLayout}
+              label="海报关键字"
+            >
               {getFieldDecorator("keyword", {
                 rules: [
                   {
