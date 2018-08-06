@@ -228,7 +228,7 @@ export default class extends Component {
           />
         </div>
         <div className=" mt30 mb30">
-          <span className=" font16 ml25 mr20">选择活动:</span>
+          <span className=" font16 ml25 mr20">任务类型:</span>
           <Select
             style={{ width: 300 }}
             onChange={this.handleChange}
