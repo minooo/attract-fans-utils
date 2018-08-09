@@ -102,7 +102,7 @@ class BaseInfoSet extends Component {
           message.error("结束时间应该在开始时间之后", 2);
           return;
         }
-        const { task1_num, task2_num, task3_num, stock, is_stock } = values;
+        const { task1_num, task2_num, task3_num, stock, state, is_stock } = values;
         const param = {
           action: "baseSetting",
           poster_id: id,
@@ -113,7 +113,8 @@ class BaseInfoSet extends Component {
           task3_num,
           stock,
           area,
-          is_stock: !!is_stock ? 1 : 0
+          is_stock:!!is_stock ? 1 : 0,
+          state: !!state ? 1 : 0
         };
         http.postC("", param, () => {
           this.setState(
@@ -272,7 +273,7 @@ class BaseInfoSet extends Component {
               </div>
             </div>
             <FormItem {...formItemLayout} label="活动开放地区">
-              {getFieldDecorator("state")(
+              {getFieldDecorator("city")(
                 <Cascader
                   style={{ maxWidth: "400px" }}
                   options={city}
@@ -300,26 +301,34 @@ class BaseInfoSet extends Component {
                 说明：选择限制地区后，非该地区粉丝无法获取海报以及非该地区粉丝助力无效，选择地区点击添加，如需要删除点击对应地区即可订阅号无法获取。
               </div>
             </div>
-            <FormItem {...formItemLayout} label="活动奖品库存">
-              {getFieldDecorator("stock", {
-                initialValue: setting && setting.stock,
-                rules: [
-                  {
-                    required: true,
-                    message: "请填写库存"
-                  }
-                ]
-              })(<InputNumber min={0} />)}
-              <div className="c666 font12">
-                说明：库存设置为0，则表示不限制库存；
-                库存减少到0时，系统自动终止活动。
-              </div>
-            </FormItem>
-            <FormItem {...formItemLayout} label="取消扣除人气">
+            <FormItem {...formItemLayout} label="是否限制库存">
               {getFieldDecorator("is_stock", {
                 valuePropName: "checked",
                 initialValue: setting && setting.is_stock === 1
               })(<Switch />)}
+              <div className="c666 font12">
+                说明：如果未开启则不限制库存。
+              </div>
+            </FormItem>
+            <FormItem {...formItemLayout} label="活动奖品库存">
+              {getFieldDecorator("stock", {
+                initialValue: setting && setting.is_stock === 1 ? setting && setting.stock:null,
+                rules: [
+                  {
+                    required: getFieldValue("is_stock"),
+                    message: "请填写库存"
+                  }
+                ]
+              })(<InputNumber disabled={!getFieldValue("is_stock")} min={0} />)}
+              <div className="c666 font12">
+                说明：库存减少到0时，系统自动终止活动。
+              </div>
+            </FormItem>
+            <FormItem {...formItemLayout} label="取消扣除人气">
+              {getFieldDecorator("state", {
+                valuePropName: "checked",
+                initialValue: setting && setting.state === 1
+              })(<Switch  />)}
               <div className="c666 font12">
                 说明：开启后，取关扣除人气值，重新扫码只算一次助力，能有效避免粉丝取消关注。
               </div>
