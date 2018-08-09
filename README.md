@@ -22,6 +22,8 @@ export default Header;
 ## 打包
 ```
 打包后，将build下的文件部署到 dolife-public/attract-fans-utils-static/backend
+
+然后把index.html 传给后台人员。
 ```
 
 ## Nav使用
